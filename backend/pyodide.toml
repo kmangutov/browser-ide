@@ -1,0 +1,10 @@
+[build]
+# Use a packages file to keep packages minimal
+packages = []
+
+[runtimes.package]
+dependencies = []
+
+[[runtimes]]
+name = "math-wasm"
+tag = "full" 
