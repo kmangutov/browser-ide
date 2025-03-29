@@ -15,7 +15,7 @@ A client-side Machine Learning IDE that runs entirely in your browser using Pyod
 ## Quick Start
 
 ```bash
-./serve.sh
+./serve.sh  # For development only, enables CORS
 ```
 
 Open your browser to http://localhost:8000
@@ -32,7 +32,7 @@ Open your browser to http://localhost:8000
 - `index.html`: Main HTML interface
 - `styles.css`: CSS styling
 - `script.js`: JavaScript for the application
-- `serve.sh`: Local development server
+- `serve.sh`: Local development server with CORS support (not for production)
 
 ## Prerequisites
 
