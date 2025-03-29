@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browser-based ML IDE</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+      color: #333;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .card {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .full-width {
+      grid-column: span 2;
+    }
+    textarea {
+      width: 100%;
+      height: 300px;
+      font-family: monospace;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      resize: vertical;
+    }
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    button:disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
+    }
+    #loading {
+      text-align: center;
+      margin: 40px 0;
+      font-size: 18px;
+      color: #666;
+    }
+    #status {
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 4px;
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    pre {
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Browser-based ML IDE</h1>
+  
+  <div id="loading">
+    <p>Loading Pyodide and ML packages...</p>
+    <p>This may take a minute as we're loading scikit-learn, numpy, and pandas directly in your browser!</p>
+  </div>
+  
+  <div id="app" class="hidden">
+    <div class="container">
+      <div class="card full-width">
+        <h2>Machine Learning Code</h2>
+        <p>Edit the code below to customize the model training process:</p>
+        <textarea id="codeEditor">
+# Import necessary libraries
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np
+
+# Load the Iris dataset
+X, y = load_iris(return_X_y=True)
+
+# Choose a single target variable (first component of iris output)
+y = y.astype(float)
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Create and train the model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = model.predict(X_test)
+
+# Calculate metrics
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+# Print results
+print(f"Model: Linear Regression")
+print(f"Mean Squared Error: {mse:.4f}")
+print(f"R² Score: {r2:.4f}")
+print(f"Coefficients: {model.coef_}")
+print(f"Intercept: {model.intercept_}")
+
+# Return results as a dictionary
+results = {
+    "model_type": "LinearRegression",
+    "mse": float(mse),
+    "r2": float(r2),
+    "coefficients": model.coef_.tolist(),
+    "intercept": float(model.intercept_),
+    "y_test": y_test.tolist(),
+    "y_pred": y_pred.tolist()
+}
+        </textarea>
+        <button id="runButton">Train Model</button>
+        <div id="status"></div>
+      </div>
+      
+      <div class="card">
+        <h2>Model Results</h2>
+        <div id="results">
+          <p>Train the model to see results.</p>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>Console Output</h2>
+        <pre id="console"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Function to log messages to our console UI element
+    function logToConsole(message) {
+      const consoleElement = document.getElementById('console');
+      consoleElement.textContent += message + '\n';
+    }
+
+    // Clear console
+    function clearConsole() {
+      const consoleElement = document.getElementById('console');
+      consoleElement.textContent = '';
+    }
+
+    // Override console.log to also display in our UI
+    const originalConsoleLog = console.log;
+    console.log = function() {
+      originalConsoleLog.apply(console, arguments);
+      logToConsole(Array.from(arguments).join(' '));
+    };
+
+    // Show a status message
+    function showStatus(message, isError = false) {
+      const statusElement = document.getElementById('status');
+      statusElement.textContent = message;
+      statusElement.className = isError ? 'error' : 'success';
+    }
+
+    // Display results in the results panel
+    function displayResults(results) {
+      const resultsElement = document.getElementById('results');
+      
+      // Create a table for metrics
+      let html = '<h3>Metrics</h3>';
+      html += '<table>';
+      html += '<tr><th>Metric</th><th>Value</th></tr>';
+      html += `<tr><td>Mean Squared Error</td><td>${results.mse.toFixed(4)}</td></tr>`;
+      html += `<tr><td>R² Score</td><td>${results.r2.toFixed(4)}</td></tr>`;
+      html += '</table>';
+      
+      // Model parameters
+      html += '<h3>Model Parameters</h3>';
+      html += '<table>';
+      html += '<tr><th>Parameter</th><th>Value</th></tr>';
+      html += `<tr><td>Intercept</td><td>${results.intercept.toFixed(4)}</td></tr>`;
+      
+      // Coefficients
+      results.coefficients.forEach((coef, index) => {
+        html += `<tr><td>Coefficient ${index+1}</td><td>${coef.toFixed(4)}</td></tr>`;
+      });
+      html += '</table>';
+      
+      // Add export option
+      html += '<h3>Export</h3>';
+      html += '<button id="exportButton">Export Results as JSON</button>';
+      
+      resultsElement.innerHTML = html;
+      
+      // Add event listener for export button
+      document.getElementById('exportButton').addEventListener('click', () => {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(results, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "ml_results.json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+      });
+    }
+
+    // Main application
+    async function main() {
+      console.log("Starting Pyodide...");
+      
+      try {
+        // Load Pyodide
+        const pyodide = await loadPyodide();
+        console.log("Pyodide loaded successfully!");
+        
+        // Load required packages
+        console.log("Loading scikit-learn, numpy, and pandas...");
+        await pyodide.loadPackage(["scikit-learn", "numpy", "pandas"]);
+        console.log("ML packages loaded successfully!");
+        
+        // Set up the run button
+        const runButton = document.getElementById('runButton');
+        
+        runButton.addEventListener('click', async () => {
+          // Clear previous output
+          clearConsole();
+          
+          // Disable button during execution
+          runButton.disabled = true;
+          showStatus("Training model...");
+          
+          try {
+            // Get code from the editor
+            const code = document.getElementById('codeEditor').value;
+            
+            // Run the code
+            const results = await pyodide.runPythonAsync(code);
+            console.log("Code executed successfully!");
+            
+            // Display results
+            displayResults(results);
+            showStatus("Model trained successfully!");
+          } catch (error) {
+            console.error("Error executing code:", error);
+            showStatus("Error: " + error.message, true);
+          } finally {
+            // Re-enable button
+            runButton.disabled = false;
+          }
+        });
+        
+        // Hide loading, show app
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('app').classList.remove('hidden');
+        
+      } catch (error) {
+        console.error("Error loading Pyodide:", error);
+        document.getElementById('loading').innerHTML = `
+          <p>Error loading application: ${error.message}</p>
+          <p>Please check the console for more details.</p>
+        `;
+      }
+    }
+
+    // Load Pyodide script
+    const script = document.createElement('script');
+    script.src = "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js";
+    script.onload = main;
+    document.head.appendChild(script);
+  </script>
+</body>
+</html> 

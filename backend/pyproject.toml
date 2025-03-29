@@ -1,7 +1,0 @@
-[build-system]
-requires = ["pyodide-build"]
-build-backend = "pyodide_build.api"
-
-[project]
-name = "my_package"
-version = "0.1.0" 

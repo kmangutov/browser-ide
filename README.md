@@ -1,47 +1,31 @@
-# Python to WebAssembly Project
+# Browser-based ML IDE
 
-A simple project demonstrating how to compile Python code to WebAssembly and run it in a browser.
+A client-side only Machine Learning IDE that runs entirely in your browser using Pyodide to execute Python code with scikit-learn, numpy, and pandas.
 
-## Structure
+## Features
 
-- `backend/`: Python code that can be run directly or compiled to WebAssembly
-- `frontend/`: Web interface for running the WebAssembly binary
-- `dist/`: Output directory for compiled WebAssembly files
+- **100% Client-side Processing**: All machine learning code runs directly in your browser with no server dependencies
+- **Pre-configured ML Environment**: Includes scikit-learn, numpy, and pandas loaded via WebAssembly
+- **Built-in Dataset**: Uses the Iris dataset from scikit-learn
+- **Code Editor**: Customize the ML model and training process
+- **Results Visualization**: View metrics and model parameters
+- **Export Capability**: Download results as JSON
+
+## Project Structure
+
+- `index.html`: Web interface for the ML IDE with built-in code editor
+- `serve.sh`: Script to serve the project locally with CORS support
+
+## Prerequisites
+
+- A modern web browser with WebAssembly support
+- Python 3.6+ (only needed for running the local development server)
 
 ## Quick Start
 
-### 1. Setup the Environment
+Simply serve the project directory with a web server:
 
 ```bash
-cd backend
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-deactivate
-```
-
-### 2. Run the Backend Directly
-
-```bash
-cd backend
-source venv/bin/activate
-python main.py
-deactivate
-```
-
-### 3. Build the WASM Binary
-
-```bash
-cd backend
-./build.sh
-```
-
-This will compile the Python code to WebAssembly and copy the output to both `frontend/wasm/` and `dist/` directories.
-
-### 4. Serve the Frontend
-
-```bash
-cd frontend
 ./serve.sh
 ```
 
@@ -49,19 +33,46 @@ Then open your browser to http://localhost:8000
 
 ## How It Works
 
-1. The Python backend contains a simple math function (`add`) in `math_functions.py`
-2. The `build.sh` script compiles this to WebAssembly using Pyodide
-3. The frontend loads the compiled WebAssembly module
-4. When the module is successfully loaded, calculations run using the WASM binary
-5. If the WASM module fails to load, it falls back to a built-in implementation
+1. The browser loads Pyodide (v0.25.0) from CDN
+2. Pyodide initializes and loads scikit-learn, numpy, and pandas packages
+3. User can edit the ML code in the browser editor
+4. When "Train Model" is clicked, the Python code runs directly in the browser
+5. Results are displayed in the UI, including metrics and model parameters
+6. Results can be exported as JSON
 
-## Dependencies
+## Technical Details
 
-- Python 3.6+
-- pyodide-build (installed via pip)
-- Web browser with WebAssembly support
+### Pyodide Integration
 
-## Scripts
+This project demonstrates using Pyodide to run Python scientific computing libraries directly in the browser via WebAssembly:
 
-- `backend/build.sh`: Simple script to compile Python to WebAssembly
-- `frontend/serve.sh`: Simple wrapper around Python's built-in HTTP server
+1. Pyodide loads a complete Python environment
+2. Scientific packages (scikit-learn, numpy, pandas) are loaded from Pyodide's CDN
+3. Python code execution happens entirely client-side
+
+### Machine Learning Workflow
+
+The default implementation showcases:
+- Loading the Iris dataset
+- Splitting data into training and test sets
+- Training a Linear Regression model
+- Evaluating model performance with metrics
+- Displaying coefficients and predictions
+
+## Extending the Project
+
+You can extend this project by:
+- Adding support for more ML models
+- Implementing data visualization with matplotlib or Plotly
+- Adding file upload for custom datasets
+- Implementing hyperparameter tuning
+- Adding a model persistence feature
+
+## Troubleshooting
+
+If you encounter any issues:
+
+1. Make sure you're using a modern browser with WebAssembly support
+2. Check the browser console for detailed error messages
+3. Be patient during initial loading - scikit-learn and other packages take time to load in the browser
+4. If you get a "File is not a zip file" error, try clearing your browser cache
