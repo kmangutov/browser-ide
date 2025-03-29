@@ -43,6 +43,32 @@ h1 {
   line-height: 1.5;
 }
 
+/* Fix for line numbers overlapping text */
+.CodeMirror-gutter {
+  background-color: #f0f0f0;
+  border-right: 1px solid #ddd;
+  min-width: 30px;
+  text-align: right;
+}
+
+.CodeMirror-linenumber {
+  padding: 0 5px 0 5px;
+  color: #999;
+  min-width: 20px;
+}
+
+.CodeMirror-gutters {
+  border-right: 1px solid #ddd;
+}
+
+.CodeMirror-sizer {
+  margin-left: 40px !important;
+}
+
+.CodeMirror-scroll {
+  margin-bottom: -30px;
+}
+
 button {
   background-color: #3498db;
   color: white;

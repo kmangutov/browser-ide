@@ -145,12 +145,22 @@ function initCodeEditor() {
     lineWrapping: true,
     matchBrackets: true,
     autoCloseBrackets: true,
+    viewportMargin: Infinity,
+    gutters: ["CodeMirror-linenumbers"],
+    lineNumberFormatter: function(line) {
+      return line;
+    },
     extraKeys: {
       "Tab": function(cm) {
         cm.replaceSelection("    ", "end");
       }
     }
   });
+  
+  // Refresh the editor after initialization to ensure correct rendering
+  setTimeout(() => {
+    editor.refresh();
+  }, 100);
 }
 
 // Setup run button click handler
