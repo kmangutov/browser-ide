@@ -1,0 +1,227 @@
+---
+layout: ../../layouts/BlogPostLayout.astro
+title: Using Manim to Visualize Algorithms
+date: 2023-04-15
+description: Learn how to create beautiful math animations with Manim, the mathematical animation engine used by 3Blue1Brown.
+---
+
+# Using Manim to Visualize Algorithms
+
+[Manim](https://www.manim.community/) is a powerful animation engine for creating precise mathematical animations. Created by Grant Sanderson (3Blue1Brown), it enables educators and content creators to produce explanatory math videos with beautiful visualizations.
+
+## What is Manim?
+
+Manim is a Python library that specializes in creating mathematical animations. It provides tools to:
+
+- Create geometric shapes and graphs
+- Animate transformations between objects
+- Display mathematical equations
+- Create step-by-step algorithm visualizations
+- Build complex scenes with camera movements
+
+## Example: Visualizing Linear Regression
+
+Let's look at how we can use Manim to visualize a simple linear regression. This animation would show:
+
+1. Data points scattered on a coordinate plane
+2. The best-fit line being drawn through the points
+3. The error lines connecting each point to the line
+
+Here's a simplified Manim script:
+
+```python
+from manim import *
+
+class LinearRegressionScene(Scene):
+    def construct(self):
+        # Create axes
+        axes = Axes(
+            x_range=[-1, 10, 1],
+            y_range=[-1, 10, 1],
+            axis_config={"include_tip": False}
+        )
+        
+        # Add labels
+        x_label = axes.get_x_axis_label("x")
+        y_label = axes.get_y_axis_label("y")
+        
+        # Create some data points (x, y coordinates)
+        data_points = [
+            (1, 2), (2, 3), (3, 5), (4, 4), 
+            (5, 6), (6, 5), (7, 8), (8, 9)
+        ]
+        
+        dots = VGroup(*[
+            Dot(axes.c2p(x, y), color=BLUE) 
+            for x, y in data_points
+        ])
+        
+        # Create best fit line (simplified calculation)
+        # In reality, we would compute this from the data
+        line = axes.plot(lambda x: 1 + 0.9 * x, color=RED)
+        
+        # Animation sequence
+        self.play(Create(axes), Write(x_label), Write(y_label))
+        self.wait()
+        
+        self.play(Create(dots, lag_ratio=0.1))
+        self.wait()
+        
+        self.play(Create(line))
+        self.wait()
+        
+        # Create error lines
+        error_lines = VGroup()
+        for x, y in data_points:
+            point = axes.c2p(x, y)
+            line_y = 1 + 0.9 * x
+            line_point = axes.c2p(x, line_y)
+            error_line = Line(
+                point, line_point, 
+                stroke_width=2, 
+                color=GREEN
+            )
+            error_lines.add(error_line)
+        
+        self.play(Create(error_lines, lag_ratio=0.1))
+        self.wait(2)
+```
+
+## Animation Output
+
+When rendered, the animation would look something like this:
+
+![Linear Regression Animation](https://via.placeholder.com/600x400/f8f9fa/333333?text=Linear+Regression+Animation)
+
+*Note: This is a placeholder image. In a real implementation, this would be a GIF or video output from Manim.*
+
+## Advanced Features
+
+Manim offers many advanced features for creating more complex visualizations:
+
+- **3D Scenes**: Create and animate objects in 3D space
+- **LaTeX Integration**: Display mathematical equations beautifully
+- **Camera Control**: Zoom, pan, and focus on specific elements
+- **Graphing Utilities**: Plot functions and datasets with ease
+- **Custom Animations**: Define your own animation sequences
+
+## Example: Gradient Descent Animation
+
+<details>
+<summary>Expand to see a more complex example (Gradient Descent)</summary>
+
+```python
+from manim import *
+
+class GradientDescentScene(Scene):
+    def construct(self):
+        # Create a 3D axes for the loss function surface
+        axes = ThreeDAxes(
+            x_range=[-4, 4, 1],
+            y_range=[-4, 4, 1],
+            z_range=[-1, 20, 5],
+        ).scale(0.7)
+        
+        # Define a simple loss function: f(x,y) = x^2 + y^2
+        def loss_func(x, y):
+            return x**2 + y**2
+        
+        # Create the surface
+        surface = Surface(
+            lambda u, v: axes.c2p(u, v, loss_func(u, v)),
+            u_range=[-4, 4],
+            v_range=[-4, 4],
+            resolution=(30, 30),
+            fill_opacity=0.7,
+        )
+        surface.set_color_by_gradient([BLUE, GREEN, YELLOW, RED])
+        
+        # Starting point for gradient descent
+        start_point = axes.c2p(3, 3, loss_func(3, 3))
+        dot = Sphere(radius=0.1, color=WHITE).move_to(start_point)
+        
+        # Label the axes
+        x_label = MathTex("\\theta_1").next_to(axes.x_axis, RIGHT)
+        y_label = MathTex("\\theta_2").next_to(axes.y_axis, UP)
+        z_label = MathTex("J(\\theta)").next_to(axes.z_axis, UP)
+        
+        # Title
+        title = Text("Gradient Descent Optimization").to_corner(UL)
+        
+        # Add everything to the scene
+        self.add(axes, x_label, y_label, z_label, title)
+        self.play(Create(surface))
+        self.play(Create(dot))
+        
+        # Perform gradient descent steps
+        learning_rate = 0.1
+        steps = 15
+        
+        x, y = 3, 3
+        
+        for i in range(steps):
+            # Compute gradient
+            grad_x = 2 * x
+            grad_y = 2 * y
+            
+            # Update parameters
+            new_x = x - learning_rate * grad_x
+            new_y = y - learning_rate * grad_y
+            
+            # Update position
+            new_point = axes.c2p(new_x, new_y, loss_func(new_x, new_y))
+            
+            # Create a line for the step
+            line = Line(
+                dot.get_center(), 
+                new_point, 
+                color=WHITE
+            )
+            
+            # Animate the step
+            self.play(
+                Create(line),
+                dot.animate.move_to(new_point),
+                run_time=0.5
+            )
+            
+            # Update current position
+            x, y = new_x, new_y
+            
+        self.wait(2)
+```
+</details>
+
+## Getting Started with Manim
+
+To get started with Manim:
+
+1. **Install Manim**: `pip install manim`
+2. **Create a Scene**: Define a Python class inheriting from `Scene`
+3. **Implement the `construct` method**: This is where you define your animation
+4. **Render your Scene**: Run `manim -pql your_file.py YourSceneName`
+
+## Manim Community vs ManimGL
+
+There are two main forks of Manim:
+
+- **Manim Community Edition**: More user-friendly, actively maintained by the community
+- **ManimGL (Manim Graphics Library)**: Grant's personal version, used for 3Blue1Brown videos
+
+For beginners, the Community Edition is recommended due to better documentation and support.
+
+## Integration with ML Explanations
+
+Manim is perfect for explaining machine learning concepts like:
+
+- Gradient descent optimization
+- Neural network architecture and activation
+- Decision boundaries in classification
+- Principal component analysis
+- Clustering algorithms
+
+By visualizing these algorithms, we can develop stronger intuition about how machine learning works.
+
+---
+
+*Next, we'll explore how to combine Manim visualizations with Pyodide to create fully interactive mathematical explanations.* 

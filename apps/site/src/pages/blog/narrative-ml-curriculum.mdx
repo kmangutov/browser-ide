@@ -1,0 +1,227 @@
+---
+layout: ../../layouts/BlogPostLayout.astro
+title: Narrative-Driven ML Curriculum
+date: 2023-04-20
+description: A continuous story-like approach to teaching machine learning concepts, inspired by Gödel, Escher, Bach.
+---
+
+import PyodideEmbed from '../../components/PyodideEmbed.astro';
+
+# 🧵 Narrative-Driven ML Curriculum
+
+Inspired by *Gödel, Escher, Bach*, this curriculum weaves machine learning concepts into a continuous story, where each section emerges naturally from the last.
+
+## Why a narrative approach?
+
+Traditional ML courses often present concepts as disconnected topics. But in reality, each idea flows from challenges encountered in previous approaches. By teaching ML as a continuous narrative, we help learners understand not just *how* techniques work, but *why* they were developed.
+
+## 1. Linear Regression: Our First Model
+
+The simplest lens through which we can view the world is as a mapping from input to output. Linear regression establishes this foundation.
+
+<PyodideEmbed code={`# Import libraries
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+try:
+    # Generate synthetic data directly instead of using built-in datasets
+    np.random.seed(42)
+    X = np.random.rand(100, 1) * 10    # 100 samples, 1 feature
+    noise = np.random.randn(100, 1) * 2  # some random noise
+    y = 3 * X + 5 + noise               # y = 3x + 5 + noise
+
+    # Create and train model
+    model = LinearRegression()
+    model.fit(X, y)
+
+    # Make predictions across the input range
+    X_range = np.linspace(X.min(), X.max(), 100).reshape(-1, 1)
+    y_pred = model.predict(X_range)
+
+    # Print model info
+    print(f"Coefficient: {model.coef_[0][0]:.4f}")
+    print(f"Intercept: {model.intercept_[0]:.4f}")
+
+    # Create results dictionary - convert all NumPy arrays to lists
+    result = {
+        "X": X.flatten().tolist(),
+        "y": y.flatten().tolist(),
+        "X_range": X_range.flatten().tolist(),
+        "y_pred": y_pred.flatten().tolist(),
+        "coefficient": float(model.coef_[0][0]),
+        "intercept": float(model.intercept_[0])
+    }
+
+    # Return results dictionary
+    result
+except Exception as e:
+    # Return error information
+    {"error": str(e)}`} />
+
+The continuous loss function (Mean Squared Error) teaches us the fundamental idea of optimizing a model. But it also introduces the temptation to fit every data point perfectly, leading us to our next challenge...
+
+## 2. Overfitting: The Danger of Perfection
+
+Too perfect a fit spoils the truth. When a model captures not just patterns but noise, it loses its generalization power.
+
+<PyodideEmbed code={`# Import libraries
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import make_pipeline
+
+try:
+    # Generate synthetic data
+    np.random.seed(42)
+    X = np.sort(np.random.rand(20) * 5).reshape(-1, 1)
+    y = np.sin(X).ravel() + np.random.randn(20) * 0.2
+
+    # Create models with different polynomial degrees
+    degrees = [1, 3, 10]
+    models = {}
+    predictions = {}
+
+    for degree in degrees:
+        # Create polynomial regression model
+        model = make_pipeline(
+            PolynomialFeatures(degree),
+            LinearRegression()
+        )
+        model.fit(X, y)
+        models[degree] = model
+        
+        # Make predictions
+        X_range = np.linspace(0, 5, 100).reshape(-1, 1)
+        predictions[degree] = model.predict(X_range)
+        
+        # Print model details
+        print(f"Degree {degree} polynomial:")
+        train_score = model.score(X, y)
+        print(f"  Training R² score: {train_score:.4f}")
+
+    # Create results dictionary - convert all NumPy arrays to lists
+    result = {
+        "X": X.flatten().tolist(),
+        "y": y.tolist(),
+        "X_range": np.linspace(0, 5, 100).tolist(),
+        "predictions": {
+            str(degree): predictions[degree].tolist() 
+            for degree in degrees
+        },
+        "train_scores": {
+            str(degree): float(models[degree].score(X, y))
+            for degree in degrees
+        }
+    }
+
+    # Return results
+    result
+except Exception as e:
+    # Return error information
+    {"error": str(e)}`} />
+
+This leads us to a critical insight: we need a way to measure how well our model performs on data it hasn't seen before.
+
+## 3. Train/Test Split: Measuring Generalization
+
+To test our faith in generalization, we must withhold what we know. The train/test split is our first tool for measuring true learning rather than just memorization.
+
+<PyodideEmbed code={`# Import libraries
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import make_pipeline
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+
+try:
+    # Generate synthetic data
+    np.random.seed(42)
+    X = np.sort(np.random.rand(50) * 5).reshape(-1, 1)
+    y = np.sin(X).ravel() + np.random.randn(50) * 0.2
+
+    # Split data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.3, random_state=42
+    )
+
+    # Create models with different polynomial degrees
+    degrees = [1, 3, 15]
+    model_results = {}
+
+    for degree in degrees:
+        # Create polynomial regression model
+        model = make_pipeline(
+            PolynomialFeatures(degree),
+            LinearRegression()
+        )
+        model.fit(X_train, y_train)
+        
+        # Evaluate on training data
+        y_train_pred = model.predict(X_train)
+        train_mse = mean_squared_error(y_train, y_train_pred)
+        train_r2 = r2_score(y_train, y_train_pred)
+        
+        # Evaluate on testing data
+        y_test_pred = model.predict(X_test)
+        test_mse = mean_squared_error(y_test, y_test_pred)
+        test_r2 = r2_score(y_test, y_test_pred)
+        
+        # Print results
+        print(f"Degree {degree} polynomial:")
+        print(f"  Training MSE: {train_mse:.4f}, R²: {train_r2:.4f}")
+        print(f"  Testing MSE: {test_mse:.4f}, R²: {test_r2:.4f}")
+        
+        # Store results - convert NumPy arrays to lists
+        model_results[degree] = {
+            "train_mse": float(train_mse),
+            "train_r2": float(train_r2),
+            "test_mse": float(test_mse),
+            "test_r2": float(test_r2),
+            "y_train_pred": y_train_pred.tolist(),
+            "y_test_pred": y_test_pred.tolist()
+        }
+
+    # Create results dictionary - convert NumPy arrays to lists
+    result = {
+        "X_train": X_train.flatten().tolist(),
+        "y_train": y_train.tolist(),
+        "X_test": X_test.flatten().tolist(),
+        "y_test": y_test.tolist(),
+        "degrees": degrees,
+        "results": model_results
+    }
+
+    # Return results
+    result
+except Exception as e:
+    # Return error information
+    {"error": str(e)}`} />
+
+But what if not all errors are created equal? This leads us to consider the context in which our models operate.
+
+## 🌀 Narrative Flow Principles
+
+This curriculum follows several key principles:
+
+1. **Continuity**: Each section ends with a question or concept the next chapter answers
+2. **Recurrent Motifs**: Themes like overfitting, optimization, and abstraction reappear throughout
+3. **Journey**: We progress from simple to powerful models, but always return to interpretability and purpose
+
+The remaining chapters in our narrative continue this journey:
+
+- **Precision vs Recall**: Choosing what's important to get right
+- **Decision Trees**: A more human-like model of if-then rules
+- **Ensemble Methods**: The wisdom of crowds in boosting and bagging
+- **Neural Networks**: Layers of abstract representations
+- **Temporal Models**: Patterns not in space, but in sequence
+
+## Next Steps
+
+Our curriculum is designed so each concept builds naturally on the challenges and limitations revealed in the previous section. Follow along as we continue to explore machine learning through this narrative lens.
+
+[Explore More Articles →](/blog/)
+
+---
+
+*This approach is inspired by the interconnected storytelling in Douglas Hofstadter's "Gödel, Escher, Bach" which weaves together seemingly disparate concepts into a coherent whole.* 

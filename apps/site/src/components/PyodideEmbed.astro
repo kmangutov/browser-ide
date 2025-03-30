@@ -1,0 +1,220 @@
+---
+const { code } = Astro.props;
+---
+
+<div class="pyodide-embed">
+  <div class="code-editor">
+    <pre class="code-display">{code}</pre>
+  </div>
+  <div class="controls">
+    <button id="runButton">Run Code</button>
+  </div>
+  <div class="output-container">
+    <div id="output" class="output"></div>
+  </div>
+</div>
+
+<style>
+  .pyodide-embed {
+    margin: 2rem 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  
+  .code-editor {
+    padding: 1rem;
+    background-color: #282c34;
+    overflow: auto;
+    max-height: 400px;
+  }
+  
+  .code-display {
+    margin: 0;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #abb2bf;
+  }
+  
+  .controls {
+    padding: 0.5rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  #runButton {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+  }
+  
+  #runButton:hover {
+    background-color: #2980b9;
+  }
+  
+  #runButton:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+  }
+  
+  .output-container {
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+    min-height: 100px;
+  }
+  
+  .output {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    white-space: pre-wrap;
+  }
+  
+  .error {
+    color: #e74c3c;
+    font-weight: bold;
+  }
+  
+  .warning {
+    color: #f39c12;
+    font-weight: bold;
+  }
+  
+  .note {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background-color: #edf2f7;
+    border-left: 4px solid #3498db;
+    font-size: 0.9rem;
+  }
+</style>
+
+<script>
+  // Global variable to assign pyodide to
+  let pyodideReadyPromise;
+  
+  // Load Pyodide and its packages just once per page
+  function initializePyodide() {
+    if (!pyodideReadyPromise) {
+      pyodideReadyPromise = (async function() {
+        // Add the Pyodide script to the page
+        // Only do this once even if there are multiple embeds
+        if (!window.loadPyodide) {
+          const script = document.createElement('script');
+          script.src = "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js";
+          document.head.appendChild(script);
+          await new Promise(resolve => script.onload = resolve);
+        }
+        
+        console.log("Loading Pyodide...");
+        const pyodide = await window.loadPyodide();
+        console.log("Pyodide loaded successfully!");
+        
+        // Load required packages - EXACT same order as playground
+        console.log("Loading scikit-learn, numpy, and pandas...");
+        await pyodide.loadPackage(["scikit-learn", "numpy", "pandas"]);
+        console.log("ML packages loaded successfully!");
+        
+        return pyodide;
+      })();
+    }
+    return pyodideReadyPromise;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const containers = document.querySelectorAll('.pyodide-embed');
+    
+    // Initialize each PyodideEmbed container
+    containers.forEach((container, index) => {
+      const runButton = container.querySelector('#runButton');
+      const output = container.querySelector('#output');
+      const codeElement = container.querySelector('.code-display');
+      
+      // Start loading Pyodide immediately
+      // But don't block the page
+      let pyodidePromise = initializePyodide();
+      
+      // Show initial message
+      output.innerText = "Python environment loading...";
+      
+      // Set up the run button
+      runButton.addEventListener('click', async () => {
+        // Start by disabling the button during execution
+        runButton.disabled = true;
+        output.innerText = "Running...";
+        
+        try {
+          // Ensure Pyodide is loaded
+          const pyodide = await pyodidePromise;
+          
+          // Get the code
+          const userCode = codeElement.textContent;
+          
+          // Set up capturing stdout/stderr
+          let capturedOutput = "";
+          pyodide.setStdout({
+            write: (text) => {
+              capturedOutput += text;
+              output.innerText = capturedOutput;
+            }
+          });
+          
+          pyodide.setStderr({
+            write: (text) => {
+              capturedOutput += `\nError: ${text}`;
+              output.innerText = capturedOutput;
+            }
+          });
+          
+          // Execute the code directly without a wrapper
+          capturedOutput = "";
+          const result = await pyodide.runPythonAsync(userCode);
+          
+          // Check if result contains an error property (from Python try/except)
+          if (result && typeof result === 'object' && 'error' in result) {
+            output.innerHTML = `<span class="error">Error: ${result.error}</span>`;
+            console.error("Python error:", result.error);
+          } 
+          // Format and display the result if it exists and output is empty
+          else if (result !== undefined && result !== null && capturedOutput === "") {
+            if (typeof result === 'object') {
+              output.innerText = JSON.stringify(result, null, 2);
+            } else {
+              output.innerText = String(result);
+            }
+          }
+          // If we already have output from stdout/stderr, leave it as is
+          
+        } catch (error) {
+          output.innerHTML = `<span class="error">Error: ${error.message || String(error)}</span>`;
+          console.error("Python execution error:", error);
+        } finally {
+          // Re-enable the button
+          runButton.disabled = false;
+        }
+      });
+      
+      // Check if Pyodide is already loaded when visible
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          // When the component becomes visible, check if Pyodide is loaded
+          pyodidePromise.then(() => {
+            output.innerText = "Python environment ready. Click 'Run Code' to execute.";
+          }).catch(error => {
+            output.innerText = `Error loading Python: ${error.message}`;
+            console.error("Failed to load Pyodide:", error);
+          });
+          observer.disconnect();
+        }
+      });
+      
+      observer.observe(container);
+    });
+  });
+</script> 

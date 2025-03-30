@@ -1,45 +1,64 @@
-# Browser-based ML IDE
+# ML Playground + Blog
 
-A client-side Machine Learning IDE that runs entirely in your browser using Pyodide to execute Python ML code with scikit-learn, numpy, and pandas.
+A monorepo containing an interactive Machine Learning playground and narrative-driven blog.
 
-![Screenshot of the ML IDE](./screenshot.png)
+![Screenshot of the ML IDE](./apps/playground/screenshot.png)
+
+## Project Structure
+
+This project follows a monorepo structure:
+
+- `apps/playground/`: Browser-based ML IDE that runs entirely in your browser using Pyodide
+- `apps/site/`: Astro-based blog/docs site with MDX support and interactive examples
 
 ## Features
 
-- **100% Client-side Processing**: No server dependencies
+### Playground
+
+- **100% Client-side Processing**: Run ML code without a server
 - **Built-in ML Environment**: scikit-learn, numpy, and pandas via WebAssembly
 - **Syntax Highlighting**: Python code editor with syntax highlighting
 - **Real-time Results**: View metrics and model parameters
-- **Export**: Download results as JSON
+
+### Blog
+
+- **Narrative-Driven Learning**: ML concepts explained as a continuous story
+- **Interactive Examples**: Embedded Pyodide snippets you can run in the browser
+- **Algorithm Visualizations**: Manim-powered animations to illustrate concepts
+- **MDX Support**: Rich content mixing Markdown and interactive components
 
 ## Quick Start
 
 ```bash
-./serve.sh  # For development only, enables CORS
+# For playground only
+cd apps/playground
+./serve.sh
+
+# For Astro site development
+cd apps/site
+npm install
+npm run dev
 ```
 
-Open your browser to http://localhost:8000
+## GitHub Pages Deployment
 
-## How It Works
+This project is designed to be compatible with GitHub Pages:
 
-1. Loads Pyodide (Python via WebAssembly) in the browser
-2. Imports scikit-learn, numpy, and pandas packages
-3. Executes Python code directly in the browser
-4. Displays results and metrics in the UI
+1. The Astro site is configured to build to the `/docs` directory
+2. The playground is preserved at the root level for backward compatibility
+3. All navigation and paths are designed to work with GitHub Pages URL structure
 
-## Project Structure
+## Development Notes
 
-- `index.html`: Main HTML interface
-- `styles.css`: CSS styling
-- `script.js`: JavaScript for the application
-- `serve.sh`: Local development server with CORS support (not for production)
+- Be careful when modifying the Pyodide setup, as it requires specific structure to work correctly
+- When working on the blog, test interactive components in both development and production builds
+- GitHub Pages deployment will automatically serve from the `/docs` directory
 
 ## Prerequisites
 
 - Modern web browser with WebAssembly support
+- Node.js (for Astro site development)
 
-## Troubleshooting
+---
 
-- Use a modern browser (Chrome, Firefox, Edge, Safari)
-- Check console for errors
-- Initial loading may take time as packages are downloaded
+*This project combines a browser-based ML playground with narrative-driven educational content, all running client-side with Pyodide.*

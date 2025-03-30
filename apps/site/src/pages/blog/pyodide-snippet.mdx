@@ -1,0 +1,117 @@
+---
+layout: ../../layouts/BlogPostLayout.astro
+title: Running scikit-learn in the browser
+date: 2023-04-10
+description: Learn how to run Python machine learning code directly in your browser using Pyodide and scikit-learn without any server or installation.
+---
+
+import PyodideEmbed from '../../components/PyodideEmbed.astro';
+
+# Running scikit-learn in the browser
+
+Machine learning typically requires a Python environment with libraries like scikit-learn installed. But what if you could run this code directly in your browser? That's exactly what [Pyodide](https://pyodide.org/) enables by bringing Python to WebAssembly.
+
+## How it works
+
+Pyodide is a Python interpreter compiled to WebAssembly, allowing Python to run directly in the browser. When combined with scientific libraries like NumPy, pandas, and scikit-learn, it enables running machine learning algorithms without a server.
+
+### Benefits:
+
+- No installation required
+- No server-side processing
+- Secure execution in browser sandbox
+- Accessible from any device with a modern browser
+
+## Example: Linear Regression with scikit-learn
+
+Below is a simple example using scikit-learn to perform linear regression on synthetic data:
+
+<PyodideEmbed code={`# Import necessary libraries
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+import numpy as np
+
+try:
+    # Generate synthetic data
+    np.random.seed(42)
+    X = np.random.rand(100, 4) * 10  # 100 samples, 4 features
+    y = 2 + 3 * X[:, 0] + 1.5 * X[:, 1] - 0.5 * X[:, 2] + 0.2 * X[:, 3] + np.random.randn(100) * 2
+
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Create and train the model
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+
+    # Make predictions
+    y_pred = model.predict(X_test)
+
+    # Calculate metrics
+    mse = mean_squared_error(y_test, y_pred)
+    r2 = r2_score(y_test, y_pred)
+
+    # Print results
+    print(f"Model: Linear Regression")
+    print(f"Mean Squared Error: {mse:.4f}")
+    print(f"R² Score: {r2:.4f}")
+    print(f"Coefficients: {model.coef_}")
+    print(f"Intercept: {model.intercept_}")
+
+    # Create a results dictionary to return - convert all NumPy arrays to lists
+    result = {
+        "model_type": "LinearRegression",
+        "mse": float(mse),
+        "r2": float(r2),
+        "coefficients": model.coef_.tolist(),
+        "intercept": float(model.intercept_),
+        "y_test": y_test.tolist(),
+        "y_pred": y_pred.tolist()
+    }
+
+    # This dictionary will be converted to JSON-friendly format automatically
+    result
+except Exception as e:
+    # Return error information if something goes wrong
+    {"error": str(e)}`} />
+
+## How the code works
+
+This example demonstrates several key concepts:
+
+1. **Data Generation**: Creating synthetic data with known relationships
+2. **Data Preparation**: Splitting the data into training and testing sets
+3. **Model Creation**: Initializing a LinearRegression model
+4. **Model Training**: Fitting the model to our training data
+5. **Prediction**: Using the trained model to make predictions
+6. **Evaluation**: Calculating metrics to assess model performance
+
+## Try it yourself
+
+You can modify the code above to experiment with:
+
+- Different data generation (change coefficients or add nonlinear terms)
+- Different models (try `RandomForestRegressor` or `SVR`)
+- Different hyperparameters or feature sets
+
+## Technical considerations
+
+While Pyodide is impressive, there are some limitations:
+
+- **Initial load time**: The first load downloads Python and libraries (~10-20MB)
+- **Memory constraints**: Browser memory limits complex computations
+- **Performance**: Native Python is generally faster for intensive tasks
+- **Library support**: Not all Python libraries work in the browser (for example, visualization libraries and file I/O operations may have limitations)
+
+For production applications with large datasets, a server-based approach is recommended. However, for learning, experimentation, and demonstrations, browser-based ML is incredibly powerful and accessible.
+
+## Next steps
+
+Check out our playground to experiment with more ML models and techniques, all running directly in your browser!
+
+[Go to Playground →](/)
+
+---
+
+*This blog post is part of our series on making machine learning more accessible through browser-based tools.* 

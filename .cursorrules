@@ -1,0 +1,24 @@
+# .cursorrules.md
+
+## Project Structure
+- Use a monorepo layout: `apps/`, `scripts/`, `packages/`
+- `apps/playground/`: HTML/JS static site with Pyodide + scikit-learn
+- `apps/site/`: Astro-based blog/docs (MDX, narrative, clean aesthetics)
+
+## GitHub Pages
+- Preserve compatibility with GitHub Pages (serve from root or `/docs` folder)
+- Avoid breaking relative paths in HTML/JS
+
+## Code Style
+- Keep HTML/JS minimal and readable
+- Use semantic HTML and accessible nav elements
+- Organize CSS cleanly; favor utility classes if Astro adds Tailwind later
+
+## JS/Markdown Embeds
+- Support interactive JS snippets (for playground + blog MDX)
+- Prioritize narrative-first, textbook-style presentation
+
+## Iterative Workflow
+- Make small, reversible changes
+- Ensure playground and blog remains functional at every step
+- Add blog/docs features incrementally

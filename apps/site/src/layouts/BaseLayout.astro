@@ -1,0 +1,89 @@
+---
+const { title, description } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content={description || "Machine Learning Blog and Playground"}>
+  <title>{title || "ML Playground"}</title>
+  <style>
+    /* Basic styles */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+      color: #333;
+    }
+    
+    /* Navigation Styles */
+    .main-nav {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .main-nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+    }
+    
+    .main-nav li {
+      padding: 0;
+    }
+    
+    .main-nav a {
+      display: block;
+      padding: 15px 20px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+    }
+    
+    .main-nav a:hover {
+      background-color: #e9ecef;
+    }
+    
+    .main-nav a.active {
+      background-color: #3498db;
+      color: white;
+    }
+    
+    /* Content */
+    .content {
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Code blocks */
+    pre {
+      background-color: #f8f9fa;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="main-nav">
+    <ul>
+      <li><a href="/" class={Astro.url.pathname === "/" ? "active" : ""}>Playground</a></li>
+      <li><a href="/blog/" class={Astro.url.pathname.startsWith("/blog") ? "active" : ""}>Blog</a></li>
+    </ul>
+  </nav>
+  
+  <main class="content">
+    <slot />
+  </main>
+</body>
+</html> 
