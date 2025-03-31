@@ -1,0 +1,25 @@
+---
+layout: ../../../layouts/BlogPost.astro
+title: "Overfitting: When Models Learn Too Well"
+description: "Understanding the dangers of perfect memorization"
+pubDate: "April 1 2023"
+---
+
+# Overfitting: The Trap of Perfection
+
+## Too perfect a fit spoils the truth — complexity hides generalization
+In our previous lesson, we saw how a simple line could model relationships between variables. But what happens when we use a more complex model that fits our training data perfectly? Rather than capturing the underlying pattern, our model starts to memorize the noise and peculiarities of our specific dataset.
+
+{/* TODO: Add Manim animation showing progressively more complex polynomial fits to the same data */}
+
+## Gives rise to the need for validation and holding out data
+If using the same data for both training and evaluation, we have no way to know if our model has learned generalizable patterns. This realization introduces a fundamental concept in machine learning: we need separate data to validate our model's performance.
+
+{/* TODO: Add interactive Python snippet showing how a model's training error decreases while validation error starts to increase at some point of complexity */}
+
+## The bias-variance tradeoff
+At the heart of overfitting lies a fundamental tension: simpler models may fail to capture important patterns (high bias), while complex models might be too sensitive to noise in the training data (high variance). Finding the sweet spot between these extremes is crucial for creating models that generalize well.
+
+{/* TODO: Add Manim animation illustrating the bias-variance tradeoff with different model complexities */}
+
+If we can't trust our model just because it fits our training data well, how do we properly evaluate its performance? This brings us to our next topic: **Train/Test Split**. 

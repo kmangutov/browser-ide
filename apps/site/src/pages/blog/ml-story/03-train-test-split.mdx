@@ -1,0 +1,25 @@
+---
+layout: ../../../layouts/BlogPost.astro
+title: "Train/Test Split: Evaluating With Integrity"
+description: "How we measure true learning rather than mere memorization"
+pubDate: "April 2 2023"
+---
+
+# Train/Test Split: The Scientific Method for Machine Learning
+
+## To test our faith in generalization, we must withhold what we know
+Like a scientist formulating a hypothesis and then testing it against new observations, a machine learning model must be evaluated on data it hasn't seen during training. This is the principle behind train/test splitting: dividing our data into a portion for training and a separate portion for evaluation.
+
+{/* TODO: Add Manim animation showing a dataset being split into training and testing sets */}
+
+## Shows how to measure learning, not just memory
+When we evaluate our model on the test set, we're asking: "Did you learn meaningful patterns, or did you just memorize the examples I showed you?" A model that performs well on both training and testing data demonstrates that it has captured generalizable knowledge about the problem domain.
+
+{/* TODO: Add interactive Python snippet demonstrating how to split data, train a model, and evaluate it on both training and test sets */}
+
+## Sets the stage for evaluating not just how, but how well
+Beyond simply asking if a model can generalize, the train/test paradigm allows us to compare different models and techniques quantitatively. This framework gives us a principled way to determine which approach works better for a given problem, laying the foundation for scientific progress in machine learning.
+
+{/* TODO: Add Manim animation comparing different models' performances on the same train/test split */}
+
+But what exactly should we measure on our test set? The choice of metric fundamentally shapes what our model optimizes for, which brings us to our next topic: **Precision vs Recall**. 

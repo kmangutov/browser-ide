@@ -1,0 +1,25 @@
+---
+layout: ../../../layouts/BlogPost.astro
+title: "Neural Networks: Layers of Abstraction"
+description: "Understanding models inspired by the human brain"
+pubDate: "April 8 2023"
+---
+
+# Neural Networks: Inspired by Nature
+
+## A leap: from rules to layers of abstract representation
+Neural networks represent a fundamental shift in how we approach machine learning. Rather than manually engineering features or specifying rules, neural networks learn hierarchical representations of the data through layers of interconnected "neurons." Each layer transforms its input, gradually building up from simple features to complex concepts, similar to how our brains process information.
+
+{/* TODO: Add Manim animation showing how a neural network processes information through multiple layers */}
+
+## Continuous loss meets nonlinearity, and optimization deepens
+At their core, neural networks are mathematical functions with many parameters. However, the introduction of nonlinear activation functions allows them to learn complex patterns that linear models cannot capture. Training these models involves optimizing the loss function across many dimensions, a process made possible by the backpropagation algorithm, which efficiently calculates how each parameter affects the output.
+
+{/* TODO: Add interactive Python snippet demonstrating how a simple neural network learns to classify non-linearly separable data */}
+
+## Even the simplest NN echoes linear regression — with depth
+It's enlightening to see that a neural network with no hidden layers and no activation function is essentially a linear regression model. Adding depth (more layers) and nonlinearity (activation functions) transforms this simple model into a universal function approximator—capable, in theory, of learning any mapping between inputs and outputs given enough data and capacity.
+
+{/* TODO: Add Manim animation showing the progression from linear regression to a multi-layer neural network */}
+
+So far, our journey has focused on models that make predictions based on static inputs. But what about data that changes over time, where the sequence of events matters? This brings us to our final topic: **Seasonality**. 

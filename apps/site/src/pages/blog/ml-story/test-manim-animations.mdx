@@ -1,0 +1,435 @@
+---
+layout: ../../../layouts/BlogPost.astro
+title: "Testing Manim Animations for ML Story"
+description: "Examples of Manim animations for our narrative-driven ML curriculum"
+pubDate: "April 10 2023"
+---
+
+# Testing Manim Animations for ML Curriculum
+
+This page demonstrates Manim animations that will be used throughout our narrative-driven ML curriculum. We're starting with simple examples and working our way up to more complex visualizations.
+
+## Linear Regression: Points and Line Fitting
+
+Our first animation shows data points on a 2D plane and a line being fitted to them - one of the most fundamental visualizations in machine learning.
+
+```python
+from manim import *
+
+class LinearRegressionFitting(Scene):
+    def construct(self):
+        # Create axes
+        axes = Axes(
+            x_range=[-1, 10, 1],
+            y_range=[-1, 10, 1],
+            axis_config={"include_tip": False},
+            x_axis_config={"include_numbers": True},
+            y_axis_config={"include_numbers": True},
+        )
+        
+        # Add labels
+        x_label = axes.get_x_axis_label("x")
+        y_label = axes.get_y_axis_label("y")
+        labels = VGroup(x_label, y_label)
+        
+        # Create data points with slight noise
+        data_points = [
+            (1, 2), (2, 2.8), (3, 4.2), (4, 4.5), 
+            (5, 5.7), (6, 6.3), (7, 7.5), (8, 8.2)
+        ]
+        
+        dots = VGroup(*[
+            Dot(axes.c2p(x, y), color=BLUE) 
+            for x, y in data_points
+        ])
+        
+        # Animation sequence - start with axes
+        self.play(Create(axes), Write(labels))
+        self.wait(1)
+        
+        # Add data points one by one
+        self.play(Create(dots, lag_ratio=0.2))
+        self.wait(1)
+        
+        # First show a perfect fit line (which would be overfitting)
+        perfect_line = VMobject(color=GREEN)
+        perfect_line.set_points_smoothly([
+            axes.c2p(x, y) for x, y in data_points
+        ])
+        
+        self.play(Create(perfect_line))
+        self.wait(1)
+        
+        # Then show the best fit line that generalizes better
+        best_fit_line = axes.plot(lambda x: 1 + 0.9*x, color=RED)
+        
+        # Label the lines
+        perfect_label = Text("Overfitting", font_size=24, color=GREEN).next_to(perfect_line, UP)
+        best_fit_label = Text("Best fit", font_size=24, color=RED).next_to(best_fit_line, DOWN)
+        
+        self.play(
+            Transform(perfect_line, best_fit_line),
+            FadeIn(perfect_label),
+            FadeIn(best_fit_label)
+        )
+        self.wait(1)
+        
+        # Add MSE visualization
+        error_lines = VGroup()
+        for x, y in data_points:
+            point = axes.c2p(x, y)
+            line_y = 1 + 0.9 * x
+            line_point = axes.c2p(x, line_y)
+            error_line = Line(
+                point, line_point, 
+                stroke_width=2, 
+                color=YELLOW
+            )
+            error_lines.add(error_line)
+        
+        error_label = Text("Errors (MSE)", font_size=24, color=YELLOW).to_corner(UR)
+        
+        self.play(
+            Create(error_lines, lag_ratio=0.2),
+            Write(error_label)
+        )
+        self.wait(2)
+```
+
+<div class="manim-output">
+  {/* This is where the rendered animation will be embedded */}
+  <img src="https://via.placeholder.com/800x450/f8f9fa/333333?text=LinearRegressionFitting+Animation" alt="Linear Regression Fitting Animation" />
+</div>
+
+## Overfitting vs Generalization
+
+This animation demonstrates the concept of overfitting by comparing a simple model (straight line) with a complex model (high-degree polynomial) and showing how they perform on test data.
+
+```python
+from manim import *
+import numpy as np
+
+class OverfittingAnimation(Scene):
+    def construct(self):
+        # Create axes
+        axes = Axes(
+            x_range=[-1, 11, 1],
+            y_range=[-1, 11, 1],
+            axis_config={"include_tip": False},
+            x_axis_config={"include_numbers": True},
+            y_axis_config={"include_numbers": True},
+        )
+        
+        # Add labels
+        x_label = axes.get_x_axis_label("x")
+        y_label = axes.get_y_axis_label("y")
+        labels = VGroup(x_label, y_label)
+        
+        # Create training data points with some noise
+        np.random.seed(42)  # For reproducibility
+        x_train = np.array([1, 2, 3, 4, 5, 6, 7])
+        y_train = 1 + 0.9 * x_train + np.random.normal(0, 0.5, size=len(x_train))
+        
+        train_dots = VGroup(*[
+            Dot(axes.c2p(x, y), color=BLUE) 
+            for x, y in zip(x_train, y_train)
+        ])
+        
+        # Create test data points
+        x_test = np.array([2.5, 3.5, 5.5, 8, 9])
+        y_test = 1 + 0.9 * x_test + np.random.normal(0, 0.5, size=len(x_test))
+        
+        test_dots = VGroup(*[
+            Dot(axes.c2p(x, y), color=RED) 
+            for x, y in zip(x_test, y_test)
+        ])
+        
+        # Animation sequence
+        self.play(Create(axes), Write(labels))
+        self.wait(1)
+        
+        # Show training data
+        training_label = Text("Training data", font_size=24, color=BLUE).to_corner(UL)
+        self.play(
+            Create(train_dots, lag_ratio=0.2),
+            Write(training_label)
+        )
+        self.wait(1)
+        
+        # Show simple linear model (generalizes well)
+        linear_model = axes.plot(lambda x: 1 + 0.9*x, color=GREEN)
+        linear_label = Text("Linear model", font_size=24, color=GREEN).to_edge(UP)
+        
+        self.play(
+            Create(linear_model),
+            Write(linear_label)
+        )
+        self.wait(1)
+        
+        # Show complex model (overfits)
+        # Using a high-degree polynomial that passes through all training points
+        def complex_function(x):
+            # A complicated function that fits all training points
+            return 3 + 2*np.sin(x) + 0.2*x**2 - 0.05*x**3
+            
+        complex_model = axes.plot(complex_function, color=PURPLE)
+        complex_label = Text("Complex model (overfitting)", font_size=24, color=PURPLE).next_to(linear_label, DOWN)
+        
+        self.play(
+            Create(complex_model),
+            Write(complex_label)
+        )
+        self.wait(1)
+        
+        # Add test data
+        test_label = Text("Test data", font_size=24, color=RED).to_corner(UR)
+        self.play(
+            Create(test_dots, lag_ratio=0.2),
+            Write(test_label)
+        )
+        self.wait(1)
+        
+        # Show errors on test data for both models
+        linear_errors = VGroup()
+        complex_errors = VGroup()
+        
+        for x, y in zip(x_test, y_test):
+            # Linear model error
+            point = axes.c2p(x, y)
+            linear_y = 1 + 0.9 * x
+            linear_point = axes.c2p(x, linear_y)
+            linear_error = Line(
+                point, linear_point, 
+                stroke_width=2, 
+                color=GREEN
+            )
+            linear_errors.add(linear_error)
+            
+            # Complex model error
+            complex_y = complex_function(x)
+            complex_point = axes.c2p(x, complex_y)
+            complex_error = Line(
+                point, complex_point, 
+                stroke_width=2, 
+                color=PURPLE
+            )
+            complex_errors.add(complex_error)
+        
+        # Show linear model errors
+        self.play(Create(linear_errors, lag_ratio=0.2))
+        self.wait(1)
+        
+        # Show complex model errors (larger on test data)
+        self.play(Transform(linear_errors, complex_errors))
+        self.wait(1)
+        
+        # Highlight the conclusion
+        conclusion = Text(
+            "Simple model generalizes better to new data",
+            font_size=28
+        ).to_edge(DOWN)
+        
+        self.play(Write(conclusion))
+        self.wait(2)
+```
+
+<div class="manim-output">
+  {/* This is where the rendered animation will be embedded */}
+  <img src="https://via.placeholder.com/800x450/f8f9fa/333333?text=Overfitting+Animation" alt="Overfitting vs Generalization Animation" />
+</div>
+
+## Interactive Polynomial Regression with Pyodide
+
+Beyond static animations, we can create interactive demos that let readers experiment with the concepts themselves. Below is an interactive demo that allows you to adjust the polynomial degree and see how it affects model performance on training and test data.
+
+<div class="interactive-demo">
+  <div class="controls">
+    <label for="degree-slider">Polynomial Degree: <span id="degree-value">1</span></label>
+    <input type="range" id="degree-slider" min="1" max="15" value="1" step="1">
+    
+    <div class="metrics">
+      <div>Training MSE: <span id="train-mse">0.0000</span></div>
+      <div>Test MSE: <span id="test-mse">0.0000</span></div>
+    </div>
+  </div>
+  
+  <div id="plot-output" class="plot-container">
+    <div class="loading">Loading interactive demo...</div>
+  </div>
+</div>
+
+<script type="py" global>
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import make_pipeline
+from sklearn.metrics import mean_squared_error
+
+# Generate synthetic data
+def generate_data(n_samples=20, noise=0.5, seed=42):
+    np.random.seed(seed)
+    X = np.linspace(0, 10, n_samples).reshape(-1, 1)
+    y_true = 1 + 0.9 * X.ravel()
+    y = y_true + np.random.normal(0, noise, size=n_samples)
+    return X, y, y_true
+
+# Split data into train and test sets
+def train_test_split(X, y, test_size=0.3, random_state=42):
+    np.random.seed(random_state)
+    indices = np.random.permutation(len(X))
+    test_count = int(len(X) * test_size)
+    test_indices = indices[:test_count]
+    train_indices = indices[test_count:]
+    return X[train_indices], X[test_indices], y[train_indices], y[test_indices]
+
+# Plot the data and model predictions
+def plot_regression(X_train, X_test, y_train, y_test, degree):
+    plt.figure(figsize=(10, 6))
+    
+    # Create and train the model
+    model = make_pipeline(
+        PolynomialFeatures(degree=degree),
+        LinearRegression()
+    )
+    model.fit(X_train, y_train)
+    
+    # Make predictions
+    X_plot = np.linspace(0, 10, 100).reshape(-1, 1)
+    y_pred_plot = model.predict(X_plot)
+    y_pred_train = model.predict(X_train)
+    y_pred_test = model.predict(X_test)
+    
+    # Calculate MSE
+    train_mse = mean_squared_error(y_train, y_pred_train)
+    test_mse = mean_squared_error(y_test, y_pred_test)
+    
+    # Plot data points
+    plt.scatter(X_train, y_train, color='blue', label='Training data')
+    plt.scatter(X_test, y_test, color='red', label='Test data')
+    
+    # Plot predictions
+    plt.plot(X_plot, y_pred_plot, color='green', label=f'Polynomial (degree={degree})')
+    
+    # Add error lines for test data
+    for i in range(len(X_test)):
+        plt.plot([X_test[i], X_test[i]], [y_test[i], y_pred_test[i]], 'k--', alpha=0.3)
+    
+    # Set labels and title
+    plt.xlabel('X')
+    plt.ylabel('y')
+    plt.title(f'Polynomial Regression (degree={degree})\nTrain MSE: {train_mse:.4f}, Test MSE: {test_mse:.4f}')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    
+    # Display the plot in the output div
+    display(plt.gcf(), target="plot-output")
+    
+    # Update the MSE values on the page
+    from js import document
+    document.getElementById('train-mse').textContent = f"{train_mse:.4f}"
+    document.getElementById('test-mse').textContent = f"{test_mse:.4f}"
+    
+    # Clear the figure to avoid memory issues
+    plt.close()
+    
+    return train_mse, test_mse
+
+# Initialize data
+X, y, y_true = generate_data(n_samples=20, noise=0.8)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+
+# Initial plot
+plot_regression(X_train, X_test, y_train, y_test, degree=1)
+
+# Handle slider changes
+from js import document
+from pyodide.ffi import create_proxy
+
+def on_degree_change(event):
+    degree = int(event.target.value)
+    document.getElementById('degree-value').textContent = str(degree)
+    plot_regression(X_train, X_test, y_train, y_test, degree=degree)
+
+# Set up event listener for the slider
+degree_slider = document.getElementById('degree-slider')
+degree_slider.addEventListener('input', create_proxy(on_degree_change))
+</script>
+
+<style>
+.interactive-demo {
+  margin: 2rem 0;
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.controls {
+  margin-bottom: 1rem;
+}
+
+#degree-slider {
+  width: 100%;
+  margin: 0.5rem 0 1rem 0;
+}
+
+.metrics {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-weight: bold;
+}
+
+.plot-container {
+  width: 100%;
+  height: 400px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.loading {
+  color: #666;
+  font-style: italic;
+}
+</style>
+
+## Integration with the Blog
+
+For these animations to appear in our blog, we need to:
+
+1. Write Manim scripts like the ones above
+2. Render them as videos or GIFs
+3. Host the rendered outputs (in the project's static assets directory)
+4. Embed them in our MDX files
+
+### Testing the Rendering Process
+
+To test the rendering process, we can run:
+
+```bash
+manim -pqm test_animations.py LinearRegressionFitting
+manim -pqm test_animations.py OverfittingAnimation
+```
+
+This will render the animations at medium quality and play them immediately.
+
+### Next Steps
+
+Once we've confirmed these animations work correctly, we'll:
+
+1. Create more complex animations for other ML story lessons
+2. Integrate them with interactive Python snippets using Pyodide
+3. Ensure they work smoothly within our Astro blog framework
+
+Stay tuned for more animations covering topics like:
+- Train/Test splitting visualizations
+- Precision vs. Recall trade-offs
+- Neural network activations
+- Decision tree splitting
+- Ensemble methods visualization 

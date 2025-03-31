@@ -1,0 +1,46 @@
+---
+import BlogPost from '../../../layouts/BlogPost.astro';
+
+// Get all ML story posts sorted by filename (which contains the sequence number)
+const posts = await Astro.glob('./*.mdx');
+const sortedPosts = posts.sort((a, b) => {
+  const aNum = parseInt(a.url.split('/').pop().split('-')[0]);
+  const bNum = parseInt(b.url.split('/').pop().split('-')[0]);
+  return aNum - bNum;
+});
+---
+
+<BlogPost title="Narrative-Driven ML Curriculum" description="A journey through machine learning concepts woven into a continuous story">
+  <div class="prose prose-lg mx-auto">
+    <h1>Narrative-Driven Machine Learning</h1>
+    
+    <p class="lead">
+      Inspired by <em>Gödel, Escher, Bach</em>, this curriculum weaves machine learning concepts into a continuous story, 
+      where each section emerges naturally from the last. Join us on this journey from the simplicity of linear regression 
+      to the complexity of neural networks and time series analysis.
+    </p>
+
+    <div class="mt-10 space-y-4">
+      <h2 class="text-2xl font-bold">Lessons</h2>
+      
+      <ul class="ml-6 list-disc space-y-2">
+        {sortedPosts.map(post => (
+          <li>
+            <a href={post.url} class="text-blue-600 hover:underline">
+              {post.frontmatter.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="mt-10">
+      <h2 class="text-2xl font-bold">Narrative Flow Principles</h2>
+      <ul class="ml-6 list-disc space-y-2 mt-4">
+        <li>Each section <strong>ends with a question</strong> or concept the next chapter answers.</li>
+        <li>Recurrent motifs: overfitting, optimization, abstraction.</li>
+        <li>Story: we go from <strong>simple to powerful</strong>, but <strong>always come back to interpretability and purpose</strong>.</li>
+      </ul>
+    </div>
+  </div>
+</BlogPost> 

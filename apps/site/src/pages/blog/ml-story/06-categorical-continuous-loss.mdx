@@ -1,0 +1,25 @@
+---
+layout: ../../../layouts/BlogPost.astro
+title: "Categorical vs Continuous Loss: Measuring Different Realities"
+description: "How the nature of our prediction shapes our evaluation strategies"
+pubDate: "April 5 2023"
+---
+
+# Categorical vs Continuous Loss: The Nature of Prediction
+
+## We ask: what are we measuring? Numbers or categories?
+Thus far, we've explored various ways to evaluate models, but we haven't deeply examined how the nature of what we're predicting fundamentally changes our approach. Are we predicting a discrete category (classification) or a continuous value (regression)? This distinction shapes not only our evaluation metrics but also how our models learn.
+
+{/* TODO: Add Manim animation contrasting classification problems (e.g., identifying spam) with regression problems (e.g., predicting house prices) */}
+
+## Explores how models learn differently depending on output space
+In classification, we typically use loss functions like cross-entropy loss, which penalizes confident but wrong predictions severely. In regression, we often use mean squared error or mean absolute error, which directly measure the numerical difference between predicted and actual values. These different loss functions guide our models to learn in fundamentally different ways.
+
+{/* TODO: Add interactive Python snippet comparing how the same model architecture learns differently with categorical vs continuous loss functions */}
+
+## The bridge between worlds: probability distributions
+Behind both categorical and continuous predictions lies the concept of probability distributions. A classification model outputs a probability distribution over discrete categories, while a regression model (in its probabilistic form) outputs a continuous probability distribution. This perspective unifies our understanding and opens the door to more sophisticated modeling approaches.
+
+{/* TODO: Add Manim animation showing how both classification and regression can be viewed through the lens of probability distributions */}
+
+As we've seen, the methods we've discussed so far all involve models that make predictions based on mathematical functions. But what if we could create models that make decisions based on logical rules, similar to human reasoning? This brings us to our next topic: **Decision Trees**. 

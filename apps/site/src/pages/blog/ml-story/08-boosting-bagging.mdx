@@ -1,0 +1,25 @@
+---
+layout: ../../../layouts/BlogPost.astro
+title: "Boosting & Bagging: The Wisdom of Crowds"
+description: "How combining weak learners creates powerful, robust models"
+pubDate: "April 7 2023"
+---
+
+# Boosting & Bagging: Strength in Numbers
+
+## The wisdom of crowds: weak learners made strong
+Individual decision trees have limitations, but what if we could combine many trees to create a more powerful model? This is the fundamental insight behind ensemble methods. By aggregating the predictions of multiple "weak learners" (simple models that perform slightly better than random guessing), we can create a "strong learner" that achieves much higher accuracy.
+
+{/* TODO: Add Manim animation showing how multiple weak learners can collectively make better predictions than any individual model */}
+
+## Emphasizes diversity, randomness, and averaging as a meta-strategy
+Ensemble methods come in different flavors. Bagging (Bootstrap Aggregating) creates diversity by training each model on a random subset of the data and features, then averaging their predictions. Boosting, on the other hand, trains models sequentially, with each new model focusing on the examples that previous models struggled with. Both approaches leverage diversity and aggregation to improve performance.
+
+{/* TODO: Add interactive Python snippet demonstrating Random Forests (a bagging method) and Gradient Boosting on the same dataset */}
+
+## A solution to variance and overfitting from a systems perspective
+What makes ensemble methods particularly powerful is their ability to reduce overfitting. While individual models might overfit to their specific subset of the data, their collective prediction tends to average out these idiosyncrasies, resulting in a more generalizable model. This approach addresses overfitting not by simplifying individual models, but by creating a system that balances out their individual biases.
+
+{/* TODO: Add Manim animation comparing the decision boundaries of individual trees versus an ensemble of trees */}
+
+Ensemble methods show us that combining simple models can create powerful predictive systems. But what if, instead of having many separate models, we could create a single model with multiple interconnected layers of processing? This brings us to our next topic: **Neural Networks**. 

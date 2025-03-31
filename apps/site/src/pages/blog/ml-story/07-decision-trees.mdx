@@ -1,0 +1,25 @@
+---
+layout: ../../../layouts/BlogPost.astro
+title: "Decision Trees: Human-Like Learning"
+description: "Understanding models that learn through logical rules rather than mathematical functions"
+pubDate: "April 6 2023"
+---
+
+# Decision Trees: The Logic of Decisions
+
+## A more human-like model: if-then paths, like rules of logic
+Unlike the mathematical models we've explored so far, decision trees make predictions through a series of logical if-then rules. Starting at the root, the model traverses a path of decisions based on feature values until it reaches a leaf node that provides the prediction. This process mirrors human decision-making, making decision trees highly interpretable.
+
+{/* TODO: Add Manim animation showing how a decision tree splits data points based on feature values */}
+
+## Explores the structure of decisions
+Decision trees automatically identify the most informative features and the optimal thresholds for splitting the data. At each node, the tree chooses the split that maximizes information gain—reducing uncertainty about the target variable as much as possible. This process reveals the structure of the decision-making process inherent in the data.
+
+{/* TODO: Add interactive Python snippet demonstrating how a decision tree is built and how it splits data at each node */}
+
+## Overfitting reappears — trees can memorize too well
+Just as we saw with linear models, decision trees face the challenge of overfitting. A tree with too many nodes can perfectly fit the training data by essentially memorizing it, creating branches for every minor pattern or noise in the data. This leads to poor generalization on unseen data, reintroducing the fundamental tension between model complexity and generalizability.
+
+{/* TODO: Add Manim animation showing how a decision tree's complexity increases as it grows deeper, and how this affects its performance on test data */}
+
+If a single decision tree is prone to overfitting, could we somehow combine multiple trees to create a more robust model? This question leads us to our next topic: **Boosting / Bagging**. 

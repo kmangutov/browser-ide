@@ -1,0 +1,26 @@
+---
+layout: ../../../layouts/BlogPost.astro
+title: "Linear Regression: The Beginning of Our Journey"
+description: "Understanding the simplest lens through which we can see the world"
+pubDate: "March 31 2023"
+---
+
+# Linear Regression: Where Our Story Begins
+
+## Our simplest lens to see the world: input ↦ output
+The journey of machine learning begins with a simple idea: given some input, can we predict an output? 
+Imagine trying to predict house prices based on their size. As the size increases, the price tends to increase as well. This relationship can be modeled as a line: y = mx + b, where y is the price, x is the size, m is the slope, and b is the y-intercept.
+
+{/* TODO: Add Manim animation showing points on a 2D plane and a line being fitted to them */}
+
+## Continuous loss (MSE) teaches us the idea of optimizing a model
+How do we know if our line is a good fit? We measure the distance between our predictions and the actual values. The most common way is through Mean Squared Error (MSE): the average of the squared differences between predictions and actual values. By minimizing this loss, we find the best-fitting line.
+
+{/* TODO: Add interactive Python snippet demonstrating fitting a line to data points and showing how MSE changes */}
+
+## Introduces overfitting via the temptation to fit every data point
+But wait—what if we could create a model so complex that it passes through every single data point perfectly? Wouldn't that be better? This is where we encounter our first fundamental challenge: the tension between fitting the training data and generalizing to new, unseen data.
+
+{/* TODO: Add Manim animation showing a line vs a complex curve that fits all points, then showing how the complex curve performs poorly on new data */}
+
+As we fit our model too precisely to our training data, we risk missing the forest for the trees. This leads us naturally to our next topic: **Overfitting**. 

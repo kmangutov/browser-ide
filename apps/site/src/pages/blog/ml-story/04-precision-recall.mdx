@@ -1,0 +1,25 @@
+---
+layout: ../../../layouts/BlogPost.astro
+title: "Precision vs Recall: The Values We Choose"
+description: "Understanding the trade-offs in what we optimize for"
+pubDate: "April 3 2023"
+---
+
+# Precision vs Recall: What Matters Most?
+
+## In choosing what's important to get right, we define our values
+Not all errors are created equal. When we build models to make decisions, we implicitly encode value judgments about which kinds of mistakes are more acceptable. In classification problems, we face a fundamental choice: do we prioritize being right when we make a positive prediction (precision), or do we focus on catching as many positive cases as possible (recall)?
+
+{/* TODO: Add Manim animation illustrating the concepts of true positives, false positives, true negatives, and false negatives */}
+
+## A tension emerges: do we cry wolf or miss the threat?
+Precision and recall often exist in tension with each other. As we adjust our model to increase precision (reducing false alarms), we typically sacrifice recall (missing more actual cases). Conversely, as we increase recall to catch more positive cases, we tend to generate more false positives.
+
+{/* TODO: Add interactive Python snippet demonstrating the precision-recall trade-off by adjusting a classification threshold */}
+
+## Contextualizes error into decision-making under uncertainty
+This trade-off forces us to think about the real-world context of our model's applications. In medical diagnosis, missing a disease (false negative) might be life-threatening, while in spam detection, incorrectly flagging a legitimate email (false positive) might be more problematic than missing some spam.
+
+{/* TODO: Add Manim animation showing how the same model with different thresholds would perform in different real-world scenarios */}
+
+The precision-recall framework introduces us to thinking about model evaluation in terms of specific kinds of errors. This perspective is particularly important in certain domains, which leads us to our next topic: **Specificity vs Sensitivity**. 

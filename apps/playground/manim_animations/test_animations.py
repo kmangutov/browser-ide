@@ -1,0 +1,204 @@
+from manim import *
+import numpy as np
+
+class LinearRegressionFitting(Scene):
+    def construct(self):
+        # Create axes
+        axes = Axes(
+            x_range=[-1, 10, 1],
+            y_range=[-1, 10, 1],
+            axis_config={"include_tip": False},
+            x_axis_config={"include_numbers": True},
+            y_axis_config={"include_numbers": True},
+        )
+        
+        # Add labels
+        x_label = axes.get_x_axis_label("x")
+        y_label = axes.get_y_axis_label("y")
+        labels = VGroup(x_label, y_label)
+        
+        # Create data points with slight noise
+        data_points = [
+            (1, 2), (2, 2.8), (3, 4.2), (4, 4.5), 
+            (5, 5.7), (6, 6.3), (7, 7.5), (8, 8.2)
+        ]
+        
+        dots = VGroup(*[
+            Dot(axes.c2p(x, y), color=BLUE) 
+            for x, y in data_points
+        ])
+        
+        # Animation sequence - start with axes
+        self.play(Create(axes), Write(labels))
+        self.wait(1)
+        
+        # Add data points one by one
+        self.play(Create(dots, lag_ratio=0.2))
+        self.wait(1)
+        
+        # First show a perfect fit line (which would be overfitting)
+        perfect_line = VMobject(color=GREEN)
+        perfect_line.set_points_smoothly([
+            axes.c2p(x, y) for x, y in data_points
+        ])
+        
+        self.play(Create(perfect_line))
+        self.wait(1)
+        
+        # Then show the best fit line that generalizes better
+        best_fit_line = axes.plot(lambda x: 1 + 0.9*x, color=RED)
+        
+        # Label the lines
+        perfect_label = Text("Overfitting", font_size=24, color=GREEN).next_to(perfect_line, UP)
+        best_fit_label = Text("Best fit", font_size=24, color=RED).next_to(best_fit_line, DOWN)
+        
+        self.play(
+            Transform(perfect_line, best_fit_line),
+            FadeIn(perfect_label),
+            FadeIn(best_fit_label)
+        )
+        self.wait(1)
+        
+        # Add MSE visualization
+        error_lines = VGroup()
+        for x, y in data_points:
+            point = axes.c2p(x, y)
+            line_y = 1 + 0.9 * x
+            line_point = axes.c2p(x, line_y)
+            error_line = Line(
+                point, line_point, 
+                stroke_width=2, 
+                color=YELLOW
+            )
+            error_lines.add(error_line)
+        
+        error_label = Text("Errors (MSE)", font_size=24, color=YELLOW).to_corner(UR)
+        
+        self.play(
+            Create(error_lines, lag_ratio=0.2),
+            Write(error_label)
+        )
+        self.wait(2)
+
+class OverfittingAnimation(Scene):
+    def construct(self):
+        # Create axes
+        axes = Axes(
+            x_range=[-1, 11, 1],
+            y_range=[-1, 11, 1],
+            axis_config={"include_tip": False},
+            x_axis_config={"include_numbers": True},
+            y_axis_config={"include_numbers": True},
+        )
+        
+        # Add labels
+        x_label = axes.get_x_axis_label("x")
+        y_label = axes.get_y_axis_label("y")
+        labels = VGroup(x_label, y_label)
+        
+        # Create training data points with some noise
+        np.random.seed(42)  # For reproducibility
+        x_train = np.array([1, 2, 3, 4, 5, 6, 7])
+        y_train = 1 + 0.9 * x_train + np.random.normal(0, 0.5, size=len(x_train))
+        
+        train_dots = VGroup(*[
+            Dot(axes.c2p(x, y), color=BLUE) 
+            for x, y in zip(x_train, y_train)
+        ])
+        
+        # Create test data points
+        x_test = np.array([2.5, 3.5, 5.5, 8, 9])
+        y_test = 1 + 0.9 * x_test + np.random.normal(0, 0.5, size=len(x_test))
+        
+        test_dots = VGroup(*[
+            Dot(axes.c2p(x, y), color=RED) 
+            for x, y in zip(x_test, y_test)
+        ])
+        
+        # Animation sequence
+        self.play(Create(axes), Write(labels))
+        self.wait(1)
+        
+        # Show training data
+        training_label = Text("Training data", font_size=24, color=BLUE).to_corner(UL)
+        self.play(
+            Create(train_dots, lag_ratio=0.2),
+            Write(training_label)
+        )
+        self.wait(1)
+        
+        # Show simple linear model (generalizes well)
+        linear_model = axes.plot(lambda x: 1 + 0.9*x, color=GREEN)
+        linear_label = Text("Linear model", font_size=24, color=GREEN).to_edge(UP)
+        
+        self.play(
+            Create(linear_model),
+            Write(linear_label)
+        )
+        self.wait(1)
+        
+        # Show complex model (overfits)
+        # Using a high-degree polynomial that passes through all training points
+        def complex_function(x):
+            # A complicated function that fits all training points
+            return 3 + 2*np.sin(x) + 0.2*x**2 - 0.05*x**3
+            
+        complex_model = axes.plot(complex_function, color=PURPLE)
+        complex_label = Text("Complex model (overfitting)", font_size=24, color=PURPLE).next_to(linear_label, DOWN)
+        
+        self.play(
+            Create(complex_model),
+            Write(complex_label)
+        )
+        self.wait(1)
+        
+        # Add test data
+        test_label = Text("Test data", font_size=24, color=RED).to_corner(UR)
+        self.play(
+            Create(test_dots, lag_ratio=0.2),
+            Write(test_label)
+        )
+        self.wait(1)
+        
+        # Show errors on test data for both models
+        linear_errors = VGroup()
+        complex_errors = VGroup()
+        
+        for x, y in zip(x_test, y_test):
+            # Linear model error
+            point = axes.c2p(x, y)
+            linear_y = 1 + 0.9 * x
+            linear_point = axes.c2p(x, linear_y)
+            linear_error = Line(
+                point, linear_point, 
+                stroke_width=2, 
+                color=GREEN
+            )
+            linear_errors.add(linear_error)
+            
+            # Complex model error
+            complex_y = complex_function(x)
+            complex_point = axes.c2p(x, complex_y)
+            complex_error = Line(
+                point, complex_point, 
+                stroke_width=2, 
+                color=PURPLE
+            )
+            complex_errors.add(complex_error)
+        
+        # Show linear model errors
+        self.play(Create(linear_errors, lag_ratio=0.2))
+        self.wait(1)
+        
+        # Show complex model errors (larger on test data)
+        self.play(Transform(linear_errors, complex_errors))
+        self.wait(1)
+        
+        # Highlight the conclusion
+        conclusion = Text(
+            "Simple model generalizes better to new data",
+            font_size=28
+        ).to_edge(DOWN)
+        
+        self.play(Write(conclusion))
+        self.wait(2) 
