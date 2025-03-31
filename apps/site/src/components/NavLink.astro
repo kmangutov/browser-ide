@@ -1,0 +1,7 @@
+import { navLink } from '../utils/paths.js';
+
+const { href, class: className, ...props } = Astro.props;
+
+<a href={navLink(href)} class={className} {...props}>
+  <slot />
+</a> 

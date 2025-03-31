@@ -1,46 +1,102 @@
 ---
-import BlogPost from '../../../layouts/BlogPost.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { navLink } from '../../../utils/paths.js';
 
 // Get all ML story posts sorted by filename (which contains the sequence number)
 const posts = await Astro.glob('./*.mdx');
 const sortedPosts = posts.sort((a, b) => {
-  const aNum = parseInt(a.url.split('/').pop().split('-')[0]);
-  const bNum = parseInt(b.url.split('/').pop().split('-')[0]);
+  const aNum = parseInt(a.url.split('/').pop().split('-')[0]) || 0;
+  const bNum = parseInt(b.url.split('/').pop().split('-')[0]) || 0;
   return aNum - bNum;
 });
+
+const title = "Narrative-Driven ML Curriculum";
+const description = "A journey through machine learning concepts woven into a continuous story";
 ---
 
-<BlogPost title="Narrative-Driven ML Curriculum" description="A journey through machine learning concepts woven into a continuous story">
-  <div class="prose prose-lg mx-auto">
-    <h1>Narrative-Driven Machine Learning</h1>
+<BaseLayout title={title} description={description}>
+  <article>
+    <header>
+      <h1>{title}</h1>
+    </header>
     
-    <p class="lead">
-      Inspired by <em>Gödel, Escher, Bach</em>, this curriculum weaves machine learning concepts into a continuous story, 
-      where each section emerges naturally from the last. Join us on this journey from the simplicity of linear regression 
-      to the complexity of neural networks and time series analysis.
-    </p>
+    <div class="prose prose-lg mx-auto">      
+      <p class="lead">
+        Inspired by <em>Gödel, Escher, Bach</em>, this curriculum weaves machine learning concepts into a continuous story, 
+        where each section emerges naturally from the last. Join us on this journey from the simplicity of linear regression 
+        to the complexity of neural networks and time series analysis.
+      </p>
 
-    <div class="mt-10 space-y-4">
-      <h2 class="text-2xl font-bold">Lessons</h2>
-      
-      <ul class="ml-6 list-disc space-y-2">
-        {sortedPosts.map(post => (
-          <li>
-            <a href={post.url} class="text-blue-600 hover:underline">
-              {post.frontmatter.title}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
+      <div class="mt-10 space-y-4">
+        <h2 class="text-2xl font-bold">Lessons</h2>
+        
+        <ul class="ml-6 list-disc space-y-2">
+          {sortedPosts.filter(post => !post.url.includes('test-manim')).map(post => {
+            // Get the URL and ensure it works with the base path
+            const lessonPath = post.url.replace(/^\//, ''); // Remove leading slash if present
+            return (
+              <li>
+                <a href={import.meta.env.BASE_URL + lessonPath} class="text-blue-600 hover:underline">
+                  {post.frontmatter.title}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
 
-    <div class="mt-10">
-      <h2 class="text-2xl font-bold">Narrative Flow Principles</h2>
-      <ul class="ml-6 list-disc space-y-2 mt-4">
-        <li>Each section <strong>ends with a question</strong> or concept the next chapter answers.</li>
-        <li>Recurrent motifs: overfitting, optimization, abstraction.</li>
-        <li>Story: we go from <strong>simple to powerful</strong>, but <strong>always come back to interpretability and purpose</strong>.</li>
-      </ul>
+      <div class="mt-10">
+        <h2 class="text-2xl font-bold">Narrative Flow Principles</h2>
+        <ul class="ml-6 list-disc space-y-2 mt-4">
+          <li>Each section <strong>ends with a question</strong> or concept the next chapter answers.</li>
+          <li>Recurrent motifs: overfitting, optimization, abstraction.</li>
+          <li>Story: we go from <strong>simple to powerful</strong>, but <strong>always come back to interpretability and purpose</strong>.</li>
+        </ul>
+      </div>
     </div>
-  </div>
-</BlogPost> 
+  </article>
+
+  <style>
+    .lead {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+    
+    .mt-10 {
+      margin-top: 2.5rem;
+    }
+    
+    .space-y-4 > * + * {
+      margin-top: 1rem;
+    }
+    
+    .space-y-2 > * + * {
+      margin-top: 0.5rem;
+    }
+    
+    .ml-6 {
+      margin-left: 1.5rem;
+    }
+    
+    .text-2xl {
+      font-size: 1.5rem;
+    }
+    
+    .font-bold {
+      font-weight: bold;
+    }
+    
+    .text-blue-600 {
+      color: #3182ce;
+    }
+    
+    .hover\:underline:hover {
+      text-decoration: underline;
+    }
+    
+    .prose {
+      line-height: 1.8;
+    }
+  </style>
+</BaseLayout> 

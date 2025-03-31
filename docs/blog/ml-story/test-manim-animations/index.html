@@ -1,0 +1,246 @@
+<!DOCTYPE html><html lang="en" data-astro-cid-37fxchfa> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Examples of Manim animations for our narrative-driven ML curriculum"><title>Testing Manim Animations for ML Story</title><style>body{font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif;max-width:1000px;margin:0 auto;padding:20px;line-height:1.6;color:#333}.main-nav[data-astro-cid-37fxchfa]{background-color:#f8f9fa;border-radius:8px;margin-bottom:20px;box-shadow:0 2px 4px #0000001a}.main-nav[data-astro-cid-37fxchfa] ul[data-astro-cid-37fxchfa]{list-style:none;padding:0;margin:0;display:flex}.main-nav[data-astro-cid-37fxchfa] li[data-astro-cid-37fxchfa]{padding:0}.main-nav[data-astro-cid-37fxchfa] a[data-astro-cid-37fxchfa]{display:block;padding:15px 20px;text-decoration:none;color:#333;font-weight:500}.main-nav[data-astro-cid-37fxchfa] a[data-astro-cid-37fxchfa]:hover{background-color:#e9ecef}.main-nav[data-astro-cid-37fxchfa] a[data-astro-cid-37fxchfa].active{background-color:#3498db;color:#fff}.content[data-astro-cid-37fxchfa]{background-color:#fff;padding:2rem;border-radius:8px;box-shadow:0 2px 4px #0000001a}pre[data-astro-cid-37fxchfa]{background-color:#f8f9fa;padding:1rem;border-radius:4px;overflow-x:auto}
+article[data-astro-cid-2q5oecfc]{margin-bottom:2rem}header[data-astro-cid-2q5oecfc]{margin-bottom:2rem}h1[data-astro-cid-2q5oecfc]{margin-bottom:.5rem;color:#2c3e50}time[data-astro-cid-2q5oecfc]{color:#7f8c8d;font-size:.9rem}.prose[data-astro-cid-2q5oecfc]{line-height:1.8}.prose[data-astro-cid-2q5oecfc] h2[data-astro-cid-2q5oecfc]{margin-top:2rem;color:#2c3e50}.prose[data-astro-cid-2q5oecfc] p[data-astro-cid-2q5oecfc]{margin:1rem 0}.prose[data-astro-cid-2q5oecfc] img[data-astro-cid-2q5oecfc]{max-width:100%;border-radius:4px}.prose[data-astro-cid-2q5oecfc] .demo-container[data-astro-cid-2q5oecfc]{background-color:#f8f9fa;border-radius:4px;padding:1rem;margin:1.5rem 0}
+</style></head> <body data-astro-cid-37fxchfa> <!-- Navigation Bar --> <nav class="main-nav" data-astro-cid-37fxchfa> <ul data-astro-cid-37fxchfa> <li data-astro-cid-37fxchfa><a href="/" class="" data-astro-cid-37fxchfa>Playground</a></li> <li data-astro-cid-37fxchfa><a href="/blog/" class="" data-astro-cid-37fxchfa>Blog</a></li> </ul> </nav> <main class="content" data-astro-cid-37fxchfa>  <article data-astro-cid-2q5oecfc> <header data-astro-cid-2q5oecfc> <h1 data-astro-cid-2q5oecfc>Testing Manim Animations for ML Story</h1>  </header> <div class="prose" data-astro-cid-2q5oecfc> <h1 id="testing-manim-animations-for-ml-curriculum">Testing Manim Animations for ML Curriculum</h1>
+<p>This page demonstrates Manim animations that will be used throughout our narrative-driven ML curriculum. We’re starting with simple examples and working our way up to more complex visualizations.</p>
+<h2 id="linear-regression-points-and-line-fitting">Linear Regression: Points and Line Fitting</h2>
+<p>Our first animation shows data points on a 2D plane and a line being fitted to them - one of the most fundamental visualizations in machine learning.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="python"><code><span class="line"><span style="color:#F97583">from</span><span style="color:#E1E4E8"> manim </span><span style="color:#F97583">import</span><span style="color:#F97583"> *</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> LinearRegressionFitting</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">Scene</span><span style="color:#E1E4E8">):</span></span>
+<span class="line"><span style="color:#F97583">    def</span><span style="color:#B392F0"> construct</span><span style="color:#E1E4E8">(self):</span></span>
+<span class="line"><span style="color:#6A737D">        # Create axes</span></span>
+<span class="line"><span style="color:#E1E4E8">        axes </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Axes(</span></span>
+<span class="line"><span style="color:#FFAB70">            x_range</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">[</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">10</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#FFAB70">            y_range</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">[</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">10</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#FFAB70">            axis_config</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#9ECBFF">&quot;include_tip&quot;</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">False</span><span style="color:#E1E4E8">},</span></span>
+<span class="line"><span style="color:#FFAB70">            x_axis_config</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#9ECBFF">&quot;include_numbers&quot;</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">True</span><span style="color:#E1E4E8">},</span></span>
+<span class="line"><span style="color:#FFAB70">            y_axis_config</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#9ECBFF">&quot;include_numbers&quot;</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">True</span><span style="color:#E1E4E8">},</span></span>
+<span class="line"><span style="color:#E1E4E8">        )</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Add labels</span></span>
+<span class="line"><span style="color:#E1E4E8">        x_label </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> axes.get_x_axis_label(</span><span style="color:#9ECBFF">&quot;x&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        y_label </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> axes.get_y_axis_label(</span><span style="color:#9ECBFF">&quot;y&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        labels </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> VGroup(x_label, y_label)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Create data points with slight noise</span></span>
+<span class="line"><span style="color:#E1E4E8">        data_points </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> [</span></span>
+<span class="line"><span style="color:#E1E4E8">            (</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">), (</span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2.8</span><span style="color:#E1E4E8">), (</span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4.2</span><span style="color:#E1E4E8">), (</span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4.5</span><span style="color:#E1E4E8">), </span></span>
+<span class="line"><span style="color:#E1E4E8">            (</span><span style="color:#79B8FF">5</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">5.7</span><span style="color:#E1E4E8">), (</span><span style="color:#79B8FF">6</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">6.3</span><span style="color:#E1E4E8">), (</span><span style="color:#79B8FF">7</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">7.5</span><span style="color:#E1E4E8">), (</span><span style="color:#79B8FF">8</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">8.2</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        ]</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#E1E4E8">        dots </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> VGroup(</span><span style="color:#F97583">*</span><span style="color:#E1E4E8">[</span></span>
+<span class="line"><span style="color:#E1E4E8">            Dot(axes.c2p(x, y), </span><span style="color:#FFAB70">color</span><span style="color:#F97583">=</span><span style="color:#79B8FF">BLUE</span><span style="color:#E1E4E8">) </span></span>
+<span class="line"><span style="color:#F97583">            for</span><span style="color:#E1E4E8"> x, y </span><span style="color:#F97583">in</span><span style="color:#E1E4E8"> data_points</span></span>
+<span class="line"><span style="color:#E1E4E8">        ])</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Animation sequence - start with axes</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.play(Create(axes), Write(labels))</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.wait(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Add data points one by one</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.play(Create(dots, </span><span style="color:#FFAB70">lag_ratio</span><span style="color:#F97583">=</span><span style="color:#79B8FF">0.2</span><span style="color:#E1E4E8">))</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.wait(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # First show a perfect fit line (which would be overfitting)</span></span>
+<span class="line"><span style="color:#E1E4E8">        perfect_line </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> VMobject(</span><span style="color:#FFAB70">color</span><span style="color:#F97583">=</span><span style="color:#79B8FF">GREEN</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        perfect_line.set_points_smoothly([</span></span>
+<span class="line"><span style="color:#E1E4E8">            axes.c2p(x, y) </span><span style="color:#F97583">for</span><span style="color:#E1E4E8"> x, y </span><span style="color:#F97583">in</span><span style="color:#E1E4E8"> data_points</span></span>
+<span class="line"><span style="color:#E1E4E8">        ])</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.play(Create(perfect_line))</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.wait(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Then show the best fit line that generalizes better</span></span>
+<span class="line"><span style="color:#E1E4E8">        best_fit_line </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> axes.plot(</span><span style="color:#F97583">lambda</span><span style="color:#E1E4E8"> x: </span><span style="color:#79B8FF">1</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> 0.9</span><span style="color:#F97583">*</span><span style="color:#E1E4E8">x, </span><span style="color:#FFAB70">color</span><span style="color:#F97583">=</span><span style="color:#79B8FF">RED</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Label the lines</span></span>
+<span class="line"><span style="color:#E1E4E8">        perfect_label </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Text(</span><span style="color:#9ECBFF">&quot;Overfitting&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">font_size</span><span style="color:#F97583">=</span><span style="color:#79B8FF">24</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">color</span><span style="color:#F97583">=</span><span style="color:#79B8FF">GREEN</span><span style="color:#E1E4E8">).next_to(perfect_line, </span><span style="color:#79B8FF">UP</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        best_fit_label </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Text(</span><span style="color:#9ECBFF">&quot;Best fit&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">font_size</span><span style="color:#F97583">=</span><span style="color:#79B8FF">24</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">color</span><span style="color:#F97583">=</span><span style="color:#79B8FF">RED</span><span style="color:#E1E4E8">).next_to(best_fit_line, </span><span style="color:#79B8FF">DOWN</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.play(</span></span>
+<span class="line"><span style="color:#E1E4E8">            Transform(perfect_line, best_fit_line),</span></span>
+<span class="line"><span style="color:#E1E4E8">            FadeIn(perfect_label),</span></span>
+<span class="line"><span style="color:#E1E4E8">            FadeIn(best_fit_label)</span></span>
+<span class="line"><span style="color:#E1E4E8">        )</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.wait(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Add MSE visualization</span></span>
+<span class="line"><span style="color:#E1E4E8">        error_lines </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> VGroup()</span></span>
+<span class="line"><span style="color:#F97583">        for</span><span style="color:#E1E4E8"> x, y </span><span style="color:#F97583">in</span><span style="color:#E1E4E8"> data_points:</span></span>
+<span class="line"><span style="color:#E1E4E8">            point </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> axes.c2p(x, y)</span></span>
+<span class="line"><span style="color:#E1E4E8">            line_y </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> 0.9</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> x</span></span>
+<span class="line"><span style="color:#E1E4E8">            line_point </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> axes.c2p(x, line_y)</span></span>
+<span class="line"><span style="color:#E1E4E8">            error_line </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Line(</span></span>
+<span class="line"><span style="color:#E1E4E8">                point, line_point, </span></span>
+<span class="line"><span style="color:#FFAB70">                stroke_width</span><span style="color:#F97583">=</span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span></span>
+<span class="line"><span style="color:#FFAB70">                color</span><span style="color:#F97583">=</span><span style="color:#79B8FF">YELLOW</span></span>
+<span class="line"><span style="color:#E1E4E8">            )</span></span>
+<span class="line"><span style="color:#E1E4E8">            error_lines.add(error_line)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#E1E4E8">        error_label </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Text(</span><span style="color:#9ECBFF">&quot;Errors (MSE)&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">font_size</span><span style="color:#F97583">=</span><span style="color:#79B8FF">24</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">color</span><span style="color:#F97583">=</span><span style="color:#79B8FF">YELLOW</span><span style="color:#E1E4E8">).to_corner(</span><span style="color:#79B8FF">UR</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.play(</span></span>
+<span class="line"><span style="color:#E1E4E8">            Create(error_lines, </span><span style="color:#FFAB70">lag_ratio</span><span style="color:#F97583">=</span><span style="color:#79B8FF">0.2</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">            Write(error_label)</span></span>
+<span class="line"><span style="color:#E1E4E8">        )</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.wait(</span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"></span></code></pre>
+<div class="manim-output"><img src="https://via.placeholder.com/800x450/f8f9fa/333333?text=LinearRegressionFitting+Animation" alt="Linear Regression Fitting Animation"/></div>
+<h2 id="overfitting-vs-generalization">Overfitting vs Generalization</h2>
+<p>This animation demonstrates the concept of overfitting by comparing a simple model (straight line) with a complex model (high-degree polynomial) and showing how they perform on test data.</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="python"><code><span class="line"><span style="color:#F97583">from</span><span style="color:#E1E4E8"> manim </span><span style="color:#F97583">import</span><span style="color:#F97583"> *</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> numpy </span><span style="color:#F97583">as</span><span style="color:#E1E4E8"> np</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> OverfittingAnimation</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">Scene</span><span style="color:#E1E4E8">):</span></span>
+<span class="line"><span style="color:#F97583">    def</span><span style="color:#B392F0"> construct</span><span style="color:#E1E4E8">(self):</span></span>
+<span class="line"><span style="color:#6A737D">        # Create axes</span></span>
+<span class="line"><span style="color:#E1E4E8">        axes </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Axes(</span></span>
+<span class="line"><span style="color:#FFAB70">            x_range</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">[</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">11</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#FFAB70">            y_range</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">[</span><span style="color:#F97583">-</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">11</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">],</span></span>
+<span class="line"><span style="color:#FFAB70">            axis_config</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#9ECBFF">&quot;include_tip&quot;</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">False</span><span style="color:#E1E4E8">},</span></span>
+<span class="line"><span style="color:#FFAB70">            x_axis_config</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#9ECBFF">&quot;include_numbers&quot;</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">True</span><span style="color:#E1E4E8">},</span></span>
+<span class="line"><span style="color:#FFAB70">            y_axis_config</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#9ECBFF">&quot;include_numbers&quot;</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">True</span><span style="color:#E1E4E8">},</span></span>
+<span class="line"><span style="color:#E1E4E8">        )</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Add labels</span></span>
+<span class="line"><span style="color:#E1E4E8">        x_label </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> axes.get_x_axis_label(</span><span style="color:#9ECBFF">&quot;x&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        y_label </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> axes.get_y_axis_label(</span><span style="color:#9ECBFF">&quot;y&quot;</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        labels </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> VGroup(x_label, y_label)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Create training data points with some noise</span></span>
+<span class="line"><span style="color:#E1E4E8">        np.random.seed(</span><span style="color:#79B8FF">42</span><span style="color:#E1E4E8">)  </span><span style="color:#6A737D"># For reproducibility</span></span>
+<span class="line"><span style="color:#E1E4E8">        x_train </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> np.array([</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">4</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">5</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">6</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">7</span><span style="color:#E1E4E8">])</span></span>
+<span class="line"><span style="color:#E1E4E8">        y_train </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> 0.9</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> x_train </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> np.random.normal(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0.5</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">size</span><span style="color:#F97583">=</span><span style="color:#79B8FF">len</span><span style="color:#E1E4E8">(x_train))</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#E1E4E8">        train_dots </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> VGroup(</span><span style="color:#F97583">*</span><span style="color:#E1E4E8">[</span></span>
+<span class="line"><span style="color:#E1E4E8">            Dot(axes.c2p(x, y), </span><span style="color:#FFAB70">color</span><span style="color:#F97583">=</span><span style="color:#79B8FF">BLUE</span><span style="color:#E1E4E8">) </span></span>
+<span class="line"><span style="color:#F97583">            for</span><span style="color:#E1E4E8"> x, y </span><span style="color:#F97583">in</span><span style="color:#79B8FF"> zip</span><span style="color:#E1E4E8">(x_train, y_train)</span></span>
+<span class="line"><span style="color:#E1E4E8">        ])</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Create test data points</span></span>
+<span class="line"><span style="color:#E1E4E8">        x_test </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> np.array([</span><span style="color:#79B8FF">2.5</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">3.5</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">5.5</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">8</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">9</span><span style="color:#E1E4E8">])</span></span>
+<span class="line"><span style="color:#E1E4E8">        y_test </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> 0.9</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> x_test </span><span style="color:#F97583">+</span><span style="color:#E1E4E8"> np.random.normal(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">0.5</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">size</span><span style="color:#F97583">=</span><span style="color:#79B8FF">len</span><span style="color:#E1E4E8">(x_test))</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#E1E4E8">        test_dots </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> VGroup(</span><span style="color:#F97583">*</span><span style="color:#E1E4E8">[</span></span>
+<span class="line"><span style="color:#E1E4E8">            Dot(axes.c2p(x, y), </span><span style="color:#FFAB70">color</span><span style="color:#F97583">=</span><span style="color:#79B8FF">RED</span><span style="color:#E1E4E8">) </span></span>
+<span class="line"><span style="color:#F97583">            for</span><span style="color:#E1E4E8"> x, y </span><span style="color:#F97583">in</span><span style="color:#79B8FF"> zip</span><span style="color:#E1E4E8">(x_test, y_test)</span></span>
+<span class="line"><span style="color:#E1E4E8">        ])</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Animation sequence</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.play(Create(axes), Write(labels))</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.wait(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Show training data</span></span>
+<span class="line"><span style="color:#E1E4E8">        training_label </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Text(</span><span style="color:#9ECBFF">&quot;Training data&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">font_size</span><span style="color:#F97583">=</span><span style="color:#79B8FF">24</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">color</span><span style="color:#F97583">=</span><span style="color:#79B8FF">BLUE</span><span style="color:#E1E4E8">).to_corner(</span><span style="color:#79B8FF">UL</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.play(</span></span>
+<span class="line"><span style="color:#E1E4E8">            Create(train_dots, </span><span style="color:#FFAB70">lag_ratio</span><span style="color:#F97583">=</span><span style="color:#79B8FF">0.2</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">            Write(training_label)</span></span>
+<span class="line"><span style="color:#E1E4E8">        )</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.wait(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Show simple linear model (generalizes well)</span></span>
+<span class="line"><span style="color:#E1E4E8">        linear_model </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> axes.plot(</span><span style="color:#F97583">lambda</span><span style="color:#E1E4E8"> x: </span><span style="color:#79B8FF">1</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> 0.9</span><span style="color:#F97583">*</span><span style="color:#E1E4E8">x, </span><span style="color:#FFAB70">color</span><span style="color:#F97583">=</span><span style="color:#79B8FF">GREEN</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        linear_label </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Text(</span><span style="color:#9ECBFF">&quot;Linear model&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">font_size</span><span style="color:#F97583">=</span><span style="color:#79B8FF">24</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">color</span><span style="color:#F97583">=</span><span style="color:#79B8FF">GREEN</span><span style="color:#E1E4E8">).to_edge(</span><span style="color:#79B8FF">UP</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.play(</span></span>
+<span class="line"><span style="color:#E1E4E8">            Create(linear_model),</span></span>
+<span class="line"><span style="color:#E1E4E8">            Write(linear_label)</span></span>
+<span class="line"><span style="color:#E1E4E8">        )</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.wait(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Show complex model (overfits)</span></span>
+<span class="line"><span style="color:#6A737D">        # Using a high-degree polynomial that passes through all training points</span></span>
+<span class="line"><span style="color:#F97583">        def</span><span style="color:#B392F0"> complex_function</span><span style="color:#E1E4E8">(x):</span></span>
+<span class="line"><span style="color:#6A737D">            # A complicated function that fits all training points</span></span>
+<span class="line"><span style="color:#F97583">            return</span><span style="color:#79B8FF"> 3</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> 2</span><span style="color:#F97583">*</span><span style="color:#E1E4E8">np.sin(x) </span><span style="color:#F97583">+</span><span style="color:#79B8FF"> 0.2</span><span style="color:#F97583">*</span><span style="color:#E1E4E8">x</span><span style="color:#F97583">**</span><span style="color:#79B8FF">2</span><span style="color:#F97583"> -</span><span style="color:#79B8FF"> 0.05</span><span style="color:#F97583">*</span><span style="color:#E1E4E8">x</span><span style="color:#F97583">**</span><span style="color:#79B8FF">3</span></span>
+<span class="line"><span style="color:#E1E4E8">            </span></span>
+<span class="line"><span style="color:#E1E4E8">        complex_model </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> axes.plot(complex_function, </span><span style="color:#FFAB70">color</span><span style="color:#F97583">=</span><span style="color:#79B8FF">PURPLE</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        complex_label </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Text(</span><span style="color:#9ECBFF">&quot;Complex model (overfitting)&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">font_size</span><span style="color:#F97583">=</span><span style="color:#79B8FF">24</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">color</span><span style="color:#F97583">=</span><span style="color:#79B8FF">PURPLE</span><span style="color:#E1E4E8">).next_to(linear_label, </span><span style="color:#79B8FF">DOWN</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.play(</span></span>
+<span class="line"><span style="color:#E1E4E8">            Create(complex_model),</span></span>
+<span class="line"><span style="color:#E1E4E8">            Write(complex_label)</span></span>
+<span class="line"><span style="color:#E1E4E8">        )</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.wait(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Add test data</span></span>
+<span class="line"><span style="color:#E1E4E8">        test_label </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Text(</span><span style="color:#9ECBFF">&quot;Test data&quot;</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">font_size</span><span style="color:#F97583">=</span><span style="color:#79B8FF">24</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">color</span><span style="color:#F97583">=</span><span style="color:#79B8FF">RED</span><span style="color:#E1E4E8">).to_corner(</span><span style="color:#79B8FF">UR</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.play(</span></span>
+<span class="line"><span style="color:#E1E4E8">            Create(test_dots, </span><span style="color:#FFAB70">lag_ratio</span><span style="color:#F97583">=</span><span style="color:#79B8FF">0.2</span><span style="color:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#E1E4E8">            Write(test_label)</span></span>
+<span class="line"><span style="color:#E1E4E8">        )</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.wait(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Show errors on test data for both models</span></span>
+<span class="line"><span style="color:#E1E4E8">        linear_errors </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> VGroup()</span></span>
+<span class="line"><span style="color:#E1E4E8">        complex_errors </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> VGroup()</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#F97583">        for</span><span style="color:#E1E4E8"> x, y </span><span style="color:#F97583">in</span><span style="color:#79B8FF"> zip</span><span style="color:#E1E4E8">(x_test, y_test):</span></span>
+<span class="line"><span style="color:#6A737D">            # Linear model error</span></span>
+<span class="line"><span style="color:#E1E4E8">            point </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> axes.c2p(x, y)</span></span>
+<span class="line"><span style="color:#E1E4E8">            linear_y </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> 1</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> 0.9</span><span style="color:#F97583"> *</span><span style="color:#E1E4E8"> x</span></span>
+<span class="line"><span style="color:#E1E4E8">            linear_point </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> axes.c2p(x, linear_y)</span></span>
+<span class="line"><span style="color:#E1E4E8">            linear_error </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Line(</span></span>
+<span class="line"><span style="color:#E1E4E8">                point, linear_point, </span></span>
+<span class="line"><span style="color:#FFAB70">                stroke_width</span><span style="color:#F97583">=</span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span></span>
+<span class="line"><span style="color:#FFAB70">                color</span><span style="color:#F97583">=</span><span style="color:#79B8FF">GREEN</span></span>
+<span class="line"><span style="color:#E1E4E8">            )</span></span>
+<span class="line"><span style="color:#E1E4E8">            linear_errors.add(linear_error)</span></span>
+<span class="line"><span style="color:#E1E4E8">            </span></span>
+<span class="line"><span style="color:#6A737D">            # Complex model error</span></span>
+<span class="line"><span style="color:#E1E4E8">            complex_y </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> complex_function(x)</span></span>
+<span class="line"><span style="color:#E1E4E8">            complex_point </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> axes.c2p(x, complex_y)</span></span>
+<span class="line"><span style="color:#E1E4E8">            complex_error </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Line(</span></span>
+<span class="line"><span style="color:#E1E4E8">                point, complex_point, </span></span>
+<span class="line"><span style="color:#FFAB70">                stroke_width</span><span style="color:#F97583">=</span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">, </span></span>
+<span class="line"><span style="color:#FFAB70">                color</span><span style="color:#F97583">=</span><span style="color:#79B8FF">PURPLE</span></span>
+<span class="line"><span style="color:#E1E4E8">            )</span></span>
+<span class="line"><span style="color:#E1E4E8">            complex_errors.add(complex_error)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Show linear model errors</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.play(Create(linear_errors, </span><span style="color:#FFAB70">lag_ratio</span><span style="color:#F97583">=</span><span style="color:#79B8FF">0.2</span><span style="color:#E1E4E8">))</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.wait(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Show complex model errors (larger on test data)</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.play(Transform(linear_errors, complex_errors))</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.wait(</span><span style="color:#79B8FF">1</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#6A737D">        # Highlight the conclusion</span></span>
+<span class="line"><span style="color:#E1E4E8">        conclusion </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> Text(</span></span>
+<span class="line"><span style="color:#9ECBFF">            &quot;Simple model generalizes better to new data&quot;</span><span style="color:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#FFAB70">            font_size</span><span style="color:#F97583">=</span><span style="color:#79B8FF">28</span></span>
+<span class="line"><span style="color:#E1E4E8">        ).to_edge(</span><span style="color:#79B8FF">DOWN</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#E1E4E8">        </span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.play(Write(conclusion))</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.wait(</span><span style="color:#79B8FF">2</span><span style="color:#E1E4E8">)</span></span>
+<span class="line"></span></code></pre>
+<div class="manim-output"><img src="https://via.placeholder.com/800x450/f8f9fa/333333?text=Overfitting+Animation" alt="Overfitting vs Generalization Animation"/></div>
+<h2 id="integration-with-the-blog">Integration with the Blog</h2>
+<p>For these animations to appear in our blog, we need to:</p>
+<ol>
+<li>Write Manim scripts like the ones above</li>
+<li>Render them as videos or GIFs</li>
+<li>Host the rendered outputs (in the project’s static assets directory)</li>
+<li>Embed them in our MDX files</li>
+</ol>
+<h3 id="testing-the-rendering-process">Testing the Rendering Process</h3>
+<p>To test the rendering process, we can run:</p>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#B392F0">manim</span><span style="color:#79B8FF"> -pqm</span><span style="color:#9ECBFF"> test_animations.py</span><span style="color:#9ECBFF"> LinearRegressionFitting</span></span>
+<span class="line"><span style="color:#B392F0">manim</span><span style="color:#79B8FF"> -pqm</span><span style="color:#9ECBFF"> test_animations.py</span><span style="color:#9ECBFF"> OverfittingAnimation</span></span>
+<span class="line"></span></code></pre>
+<p>This will render the animations at medium quality and play them immediately.</p>
+<h3 id="next-steps">Next Steps</h3>
+<p>Once we’ve confirmed these animations work correctly, we’ll:</p>
+<ol>
+<li>Create more complex animations for other ML story lessons</li>
+<li>Integrate them with interactive Python snippets using Pyodide</li>
+<li>Ensure they work smoothly within our Astro blog framework</li>
+</ol>
+<p>Stay tuned for more animations covering topics like:</p>
+<ul>
+<li>Train/Test splitting visualizations</li>
+<li>Precision vs. Recall trade-offs</li>
+<li>Neural network activations</li>
+<li>Decision tree splitting</li>
+<li>Ensemble methods visualization</li>
+</ul> </div> </article>   </main> </body></html>
