@@ -1,109 +1,71 @@
 ---
-layout: ../../../layouts/BlogPostLayout.astro
-title: "Interactive Matplotlib Animations: Create Your Own (Part 3)"
-description: "Learn how to create your own custom animations for machine learning concepts directly in the browser"
-date: 2023-04-12
-series: "interactive-animations" 
+layout: '@/layouts/blog.astro'
+title: 'Create Your Own Animations'
+description: 'Learn how to create your own interactive Matplotlib animations'
+date: '2023-05-29'
+series: 'Interactive Animations'
 part: 3
-totalParts: 3
 ---
 
-import PyodideMatplotlib from '../../../components/PyodideMatplotlib.astro';
+import PyodideMatplotlib from '@/components/PyodideMatplotlib.astro';
+import MarkdownWrapper from '@/components/MarkdownWrapper.astro';
+import { Code } from 'astro:components';
+import { getEntry } from 'astro:content';
 
-# Interactive Matplotlib Animations: Create Your Own (Part 3)
+{/* Get the Python code file */}
+export const create_your_own = await getEntry('code', 'create_your_own');
 
-In the [previous parts](1-introduction) of this series, we saw how to create linear regression and decision boundary animations. Now let's look at how to create your own custom animations.
+{/* Define code outside of JSX */}
+export const animationCode = create_your_own.body;
 
-## Creating Your Own Animations
+# Create Your Own Animations
 
-You can create your own animations by following this pattern:
+Now that we've seen a few examples, let's explore how you can create your own animations using our framework. The `AnimationHelper` class makes it easy to define complex animations that run efficiently in the browser.
 
-1. Define a class that inherits from `AnimationHelper`
-2. Implement the `setup()` method to initialize your visualization
-3. Implement the `update(frame)` method to handle animation frames
-4. Return `True` to continue the animation or `False` to end it
-5. Set your class instance to the `animation` variable
+## Getting Started
 
-### Animation Template
+Creating a custom animation requires defining a class with two main methods:
 
-<PyodideMatplotlib code={`import numpy as np
-import matplotlib.pyplot as plt
+1. `setup()` - Called once to initialize the figure, axes, and data
+2. `update(frame)` - Called for each animation frame to update the visualization
 
-class MyCustomAnimation(AnimationHelper):
-    def setup(self):
-        # Create figure and axis
-        self.fig, self.ax = plt.subplots(figsize=(8, 5))
-        self.ax.set_xlim(0, 10)
-        self.ax.set_ylim(0, 10)
-        self.ax.set_xlabel('X')
-        self.ax.set_ylabel('Y')
-        self.ax.set_title('My Custom Animation')
-        
-        # Initialize data structures
-        self.data = np.random.rand(10)
-        self.line, = self.ax.plot([], [], 'o-', color='blue', linewidth=2)
-        
-        # Animation parameters
-        self.max_frames = 100
-        
-        # Initialize figure
-        plt.tight_layout()
-        update_canvas(self.fig)
-    
-    def update(self, frame):
-        # Calculate progress as percentage of animation completed
-        progress = frame / self.max_frames
-        
-        # Update visualization based on frame
-        x = np.linspace(0, 10, 10)
-        y = 5 + 3 * np.sin(x + progress * 4 * np.pi)
-        
-        # Update line data
-        self.line.set_data(x, y)
-        
-        # End animation when we reach max_frames
-        if frame >= self.max_frames - 1:
-            return False
-            
-        return True
+Here's a template to get you started:
 
-# Create the animation instance
-animation = MyCustomAnimation()
-`} />
+<PyodideMatplotlib code={animationCode} fileName="create_your_own.py" height="400px" readOnly={true} />
 
-## Benefits Over Traditional Manim
+<MarkdownWrapper>
 
-While this approach doesn't replace all Manim functionality, it offers several advantages:
+## Benefits Compared to Traditional Manim
 
-1. **Immediate feedback**: Animations run directly in your browser
-2. **No installation**: Everything runs in the browser via WebAssembly
-3. **Interactive editing**: Modify code and instantly see results
-4. **Shareable**: Works on any modern browser without dependencies
-5. **Integration with notebooks**: Can be combined with other browser-based tools
+This approach has several advantages over traditional Manim for certain use cases:
+
+- **No installation required**: Everything runs in the browser
+- **Interactive**: Users can play, pause, and restart animations
+- **Editable**: With the code editor, users can modify and experiment
+- **Familiar API**: Uses standard Matplotlib, not a custom animation language
 
 ## Limitations
 
-This approach has some limitations compared to full Manim:
+There are some limitations compared to Manim:
 
-1. Less precise control over animation timing and tweening
-2. No 3D support (limited to what Matplotlib can render)
-3. Fewer specialized mathematical animations
-4. Performance depends on the browser and device
+- Less sophisticated camera control and effects
+- Fewer pre-built animation primitives
+- Limited to Matplotlib's visualization capabilities
+- Slower than pre-rendered animations
 
 ## Next Steps
 
-These simple examples demonstrate the concept, but you can create much more sophisticated animations:
+Try creating animations for other machine learning concepts like:
 
-1. Neural network activation visualizations
-2. Gradient descent optimization
-3. Decision boundary evolution in SVMs
-4. PCA dimension reduction
-5. Ensemble model voting
+- K-means clustering
+- Principal Component Analysis (PCA)
+- Gradient descent optimization
+- Neural network training
 
-Try modifying the examples above or create your own animations to illustrate ML concepts!
+</MarkdownWrapper>
 
-<div class="navigation-links">
-  <a href="2-decision-boundaries" class="prev-link">← Previous: Decision Boundaries</a>
+<div className="navigation-links">
+  <a href="2-decision-boundaries" className="prev-link">← Previous: Decision Boundaries</a>
   <div></div>
 </div>
 

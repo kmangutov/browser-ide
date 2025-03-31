@@ -1,354 +1,294 @@
 ---
-const { code } = Astro.props;
-// Generate a unique ID for this component instance
-const uniqueId = `pyodide_${Math.random().toString(36).substr(2, 9)}`;
-const baseUrl = import.meta.env.BASE_URL;
-// Ensure baseUrl ends with a slash
-const basePath = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+// Get the requested code or use a default
+const {
+  code = "print('Hello from Matplotlib!')",
+  height = "300px",
+  fileName = "animation.py",
+  readOnly = false
+} = Astro.props;
+
+// Generate a simple unique ID for this component instance
+const uniqueId = Math.random().toString(36).substring(2, 11);
 ---
 
-<div class="pyodide-embed" data-component-id={uniqueId} data-code={code}>
-  <div class="code-editor" id={`codeEditor_${uniqueId}`}></div>
-  <div class="controls">
-    <button class="run-button">Run Animation</button>
-    <button class="pause-button" disabled>Pause</button>
-    <button class="reset-button" disabled>Reset</button>
+<div class="pyodide-matplotlib-component">
+  <div class="editor-container" style={`height: ${height}`}>
+    <div class="code-editor" id={`code-editor-${uniqueId}`}></div>
   </div>
-  <div class="visualization-container">
-    <img class="output-canvas" id={`outputCanvas_${uniqueId}`} width="800" height="500">
+  
+  <div class="animation-controls">
+    <div class="button-container">
+      <button class="run-button">▶️ Run</button>
+      <button class="pause-button" disabled>⏸️ Pause</button>
+      <button class="resume-button" disabled>⏯️ Resume</button>
+      <button class="stop-button" disabled>⏹️ Stop</button>
+    </div>
+    <div class="status">Ready</div>
   </div>
-  <div class="output-container">
-    <div class="output-text"></div>
+  
+  <div class="visualization-container" style={`height: ${height}`}>
+    <div class="canvas-container">
+      <canvas></canvas>
+    </div>
+    <div class="output-container">
+      <pre class="output"></pre>
+      <pre class="error"></pre>
+    </div>
   </div>
 </div>
 
-<!-- Add a meta tag for base URL detection -->
-<meta name="base-url" content={basePath} />
-
-<!-- CodeMirror CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
+<!-- Import the Web Worker manager and CodeMirror -->
+<script define:vars={{ 
+  basePath: import.meta.env.BASE_URL || '', 
+  initialCode: code, 
+  isReadOnly: readOnly, 
+  elementId: `code-editor-${uniqueId}` 
+}}>
+  // Create and load the pyodide-loader script
+  const scriptPath = `${basePath}/js/pyodide-loader.js`;
+  const loaderScript = document.createElement('script');
+  loaderScript.src = scriptPath;
+  loaderScript.type = "module";
+  loaderScript.setAttribute('data-base-path', basePath);
+  document.head.appendChild(loaderScript);
+  
+  (function() {
+    // Initialize components when ready
+    document.addEventListener('DOMContentLoaded', async function() {
+      const component = document.currentScript.previousElementSibling;
+      const editorContainer = document.getElementById(elementId);
+      const canvasContainer = component.querySelector('.canvas-container');
+      const outputContainer = component.querySelector('.output');
+      const errorContainer = component.querySelector('.error');
+      const statusIndicator = component.querySelector('.status');
+      const runButton = component.querySelector('.run-button');
+      const pauseButton = component.querySelector('.pause-button');
+      const resumeButton = component.querySelector('.resume-button');
+      const stopButton = component.querySelector('.stop-button');
+      
+      // Wait for the loader script to be loaded
+      let moduleReady = false;
+      const checkModule = async () => {
+        try {
+          // Try to import the module
+          const module = await import(scriptPath);
+          return module;
+        } catch (e) {
+          // Module not ready yet, wait and try again
+          await new Promise(resolve => setTimeout(resolve, 100));
+          return checkModule();
+        }
+      };
+      
+      // Load required modules
+      const pyodideLoader = await checkModule();
+      const { loadCodeMirror, createEditor, createPyodideManager } = pyodideLoader;
+      await loadCodeMirror();
+      
+      // Initialize CodeMirror
+      const editor = createEditor(editorContainer, initialCode, { readOnly: isReadOnly });
+      
+      // Create a unique ID for this animation instance
+      const animationId = elementId;
+      
+      // Initialize Pyodide manager
+      const pyodideManager = await createPyodideManager({
+        canvasElement: canvasContainer.querySelector('canvas')
+      });
+      
+      // Set up event handlers
+      runButton.addEventListener('click', async () => {
+        // Clear previous output and errors
+        outputContainer.textContent = '';
+        errorContainer.textContent = '';
+        
+        // Disable run button, enable stop button
+        runButton.disabled = true;
+        stopButton.disabled = false;
+        pauseButton.disabled = false;
+        
+        // Update status
+        statusIndicator.textContent = 'Running...';
+        
+        try {
+          // Set up print capture
+          pyodideManager.setOutputCallback((output) => {
+            outputContainer.textContent += output + '\n';
+          });
+          
+          // Set up error capture
+          pyodideManager.setErrorCallback((error) => {
+            errorContainer.textContent = error;
+            // Enable run button, disable others
+            runButton.disabled = false;
+            pauseButton.disabled = true;
+            resumeButton.disabled = true;
+            stopButton.disabled = true;
+            // Update status
+            statusIndicator.textContent = 'Error';
+          });
+          
+          // Run the animation
+          await pyodideManager.runAnimation(editor.getValue(), animationId);
+          
+          // Update status for animation
+          statusIndicator.textContent = 'Animating...';
+          
+          // Set up animation status callbacks
+          pyodideManager.setAnimationEndCallback(() => {
+            // Animation complete
+            runButton.disabled = false;
+            pauseButton.disabled = true;
+            resumeButton.disabled = true;
+            stopButton.disabled = true;
+            statusIndicator.textContent = 'Completed';
+          });
+        } catch (error) {
+          // Handle initialization errors
+          errorContainer.textContent = error.toString();
+          runButton.disabled = false;
+          pauseButton.disabled = true;
+          resumeButton.disabled = true;
+          stopButton.disabled = true;
+          statusIndicator.textContent = 'Error';
+        }
+      });
+      
+      pauseButton.addEventListener('click', () => {
+        pyodideManager.pauseAnimation();
+        pauseButton.disabled = true;
+        resumeButton.disabled = false;
+        statusIndicator.textContent = 'Paused';
+      });
+      
+      resumeButton.addEventListener('click', () => {
+        pyodideManager.resumeAnimation();
+        pauseButton.disabled = false;
+        resumeButton.disabled = true;
+        statusIndicator.textContent = 'Animating...';
+      });
+      
+      stopButton.addEventListener('click', () => {
+        pyodideManager.stopAnimation();
+        runButton.disabled = false;
+        pauseButton.disabled = true;
+        resumeButton.disabled = true;
+        stopButton.disabled = true;
+        statusIndicator.textContent = 'Stopped';
+      });
+    });
+  })();
+</script>
 
 <style>
-  .pyodide-embed {
-    margin: 2rem 0;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
+  .pyodide-matplotlib-component {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    border-radius: 4px;
     overflow: hidden;
+    margin: 20px 0;
+    font-family: sans-serif;
+  }
+  
+  .editor-container {
+    overflow: hidden;
+    border-bottom: 1px solid #ccc;
   }
   
   .code-editor {
-    background-color: #282c34;
+    height: 100%;
+    overflow: auto;
   }
   
-  /* CodeMirror specific styles */
-  :global(.CodeMirror) {
-    height: auto;
-    max-height: 400px;
-    border: none;
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-    font-size: 14px;
-    line-height: 1.5;
+  .animation-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #ccc;
   }
   
-  /* Fix for line numbers */
-  :global(.CodeMirror-gutter) {
-    background-color: #21252b;
-    border-right: 1px solid #181a1f;
-  }
-  
-  :global(.CodeMirror-linenumber) {
-    color: #636d83;
-  }
-  
-  .controls {
-    padding: 0.5rem;
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #e0e0e0;
+  .button-container {
     display: flex;
     gap: 8px;
   }
   
-  .visualization-container {
-    padding: 1rem;
-    text-align: center;
+  .animation-controls button {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
     background-color: white;
-  }
-  
-  .output-canvas {
-    max-width: 100%;
-    height: auto;
-    border: 1px solid #e0e0e0;
-    background-color: white;
-  }
-  
-  button {
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.2s;
   }
   
-  button:hover:not(:disabled) {
-    background-color: #2980b9;
-  }
-  
-  button:disabled {
-    background-color: #95a5a6;
+  .animation-controls button:disabled {
+    opacity: 0.5;
     cursor: not-allowed;
   }
   
-  .output-container {
-    padding: 1rem;
-    background-color: #f8f9fa;
-    border-top: 1px solid #e0e0e0;
-    min-height: 50px;
+  .animation-controls button:hover:not(:disabled) {
+    background-color: #f0f0f0;
   }
   
-  .output-text {
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  .status {
     font-size: 14px;
-    white-space: pre-wrap;
+    color: #555;
+  }
+  
+  .visualization-container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .canvas-container {
+    flex: 1;
+    min-height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+  }
+  
+  .canvas-container canvas {
+    max-width: 100%;
+    max-height: 100%;
+  }
+  
+  .output-container {
+    min-height: 20px;
+    max-height: 100px;
+    overflow: auto;
+    padding: 8px;
+    background-color: #f9f9f9;
+    border-top: 1px solid #ccc;
+    font-family: monospace;
+    font-size: 14px;
+  }
+  
+  .output {
+    margin: 0;
+    color: #333;
   }
   
   .error {
-    color: #e74c3c;
-    font-weight: bold;
+    margin: 0;
+    color: #d93025;
   }
   
-  .warning {
-    color: #f39c12;
-    font-weight: bold;
+  /* Add CodeMirror theme (will be loaded automatically) */
+  :global(.cm-s-monokai.CodeMirror) {
+    background-color: #272822;
+    color: #f8f8f2;
   }
-</style>
-
-<!-- Import the Web Worker manager and CodeMirror -->
-<script src={`${basePath}js/pyodide-loader.js`} type="module" data-base-path={basePath}></script>
-<script>
-  (function() {
-    // Initialize components when ready
-    async function initializeComponents() {
-      try {
-        // Import functions from the loader
-        const { loadCodeMirror, createPyodideManager } = await import(`${document.currentScript.getAttribute('data-base-path') || '/'}js/pyodide-loader.js`);
-        
-        // Wait for scripts to load first
-        await loadCodeMirror();
-        
-        // Initialize each PyodideEmbed container
-        const containers = document.querySelectorAll('.pyodide-embed');
-        
-        containers.forEach(async (container) => {
-          const componentId = container.dataset.componentId;
-          const initialCode = container.dataset.code;
-          
-          // Get the elements for this container
-          const codeEditor = document.getElementById(`codeEditor_${componentId}`);
-          const runButton = container.querySelector('.run-button');
-          const pauseButton = container.querySelector('.pause-button');
-          const resetButton = container.querySelector('.reset-button');
-          const output = container.querySelector('.output-text');
-          const canvas = container.querySelector(`.output-canvas`);
-          
-          // Initialize CodeMirror
-          const editor = CodeMirror(codeEditor, {
-            value: initialCode,
-            mode: 'python',
-            theme: 'monokai',
-            lineNumbers: true,
-            indentUnit: 4,
-            lineWrapping: true,
-            matchBrackets: true,
-            autoCloseBrackets: true,
-            viewportMargin: Infinity,
-            gutters: ["CodeMirror-linenumbers"],
-            readOnly: false,
-            extraKeys: {
-              "Tab": function(cm) {
-                cm.replaceSelection("    ", "end");
-              }
-            }
-          });
-          
-          // Refresh to ensure proper rendering
-          setTimeout(() => {
-            editor.refresh();
-          }, 100);
-          
-          // Create a Pyodide manager instance
-          const pyodideManager = await createPyodideManager({
-            packages: ['matplotlib', 'numpy'],
-            targetFps: 30  // Limit frame rate for better performance
-          });
-          
-          // Set up event handlers for PyodideManager events
-          
-          // Output events
-          pyodideManager.on('output', (data) => {
-            output.textContent += data.output;
-            
-            // Auto-scroll to bottom
-            if (output.parentElement) {
-              output.parentElement.scrollTop = output.parentElement.scrollHeight;
-            }
-          });
-          
-          // Error events
-          pyodideManager.on('error', (data) => {
-            output.innerHTML += `<span class="error">${data.error}</span>\n`;
-            
-            // Re-enable run button on error
-            runButton.disabled = false;
-            pauseButton.disabled = true;
-            resetButton.disabled = true;
-          });
-          
-          // Animation frame updates
-          pyodideManager.on('frame', (data) => {
-            canvas.src = data.imageData;
-            
-            // If this is the last frame, update UI accordingly
-            if (data.isLastFrame) {
-              output.textContent += '\nAnimation complete.';
-              runButton.disabled = false;
-            }
-          });
-          
-          // Animation status events
-          pyodideManager.on('animationStarted', () => {
-            pauseButton.textContent = 'Pause';
-            pauseButton.disabled = false;
-            resetButton.disabled = false;
-          });
-          
-          pyodideManager.on('animationPaused', () => {
-            pauseButton.textContent = 'Resume';
-          });
-          
-          pyodideManager.on('animationResumed', () => {
-            pauseButton.textContent = 'Pause';
-          });
-          
-          pyodideManager.on('animationCompleted', () => {
-            runButton.disabled = false;
-            pauseButton.disabled = true;
-            resetButton.disabled = false;
-            pauseButton.textContent = 'Pause';
-          });
-          
-          // Status updates
-          pyodideManager.on('status', (data) => {
-            if (data.status === 'loading') {
-              output.textContent = 'Python environment loading...';
-            } else if (data.status === 'ready') {
-              output.textContent = 'Python environment ready. Click "Run Animation" to execute.';
-            }
-          });
-          
-          // Static image updates (for non-animation results)
-          pyodideManager.on('image', (data) => {
-            canvas.src = data.imageData;
-          });
-          
-          // Initialize with status message
-          output.textContent = 'Python environment loading...';
-          
-          // Setup animation controls
-          pauseButton.addEventListener('click', async () => {
-            if (pauseButton.textContent === 'Pause') {
-              await pyodideManager.pauseAnimation();
-            } else {
-              await pyodideManager.resumeAnimation();
-            }
-          });
-          
-          resetButton.addEventListener('click', async () => {
-            // Reset the animation
-            await pyodideManager.stopAnimation();
-            
-            // Clear the canvas
-            canvas.src = '';
-            
-            // Reset button states
-            pauseButton.disabled = true;
-            pauseButton.textContent = 'Pause';
-            runButton.disabled = false;
-            
-            output.textContent = 'Animation reset. Click "Run Animation" to start again.';
-          });
-          
-          // Set up the run button
-          runButton.addEventListener('click', async () => {
-            try {
-              // Start by disabling the run button
-              runButton.disabled = true;
-              output.textContent = 'Running...';
-              
-              // Get the code from CodeMirror
-              const userCode = editor.getValue();
-              
-              // Run the code in the worker
-              const result = await pyodideManager.runCode(userCode);
-              
-              // If the code defines an animation, start it
-              if (result.hasAnimation) {
-                await pyodideManager.startAnimation();
-                output.textContent = 'Animation running...';
-              }
-              else {
-                // If not an animation, re-enable the run button
-                runButton.disabled = false;
-              }
-            } catch (error) {
-              output.innerHTML = `<span class="error">Error: ${error.message || String(error)}</span>`;
-              console.error("Execution error:", error);
-              
-              // Re-enable the run button on error
-              runButton.disabled = false;
-            }
-          });
-          
-          // Initialize PyodideManager when the component is visible
-          const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-              pyodideManager.initialize().then(() => {
-                output.textContent = 'Python environment ready. Click "Run Animation" to execute.';
-              }).catch(error => {
-                output.innerHTML = `<span class="error">Error loading Python: ${error.message}</span>`;
-                console.error("Failed to initialize Pyodide:", error);
-              });
-              
-              observer.disconnect();
-            }
-          });
-          
-          observer.observe(container);
-          
-          // Clean up on page unload
-          window.addEventListener('beforeunload', () => {
-            pyodideManager.terminate();
-          });
-        });
-      } catch (error) {
-        console.error("Failed to initialize PyodideMatplotlib:", error);
-        document.querySelectorAll('.pyodide-embed .output-text').forEach(output => {
-          output.innerHTML = `<span class="error">Error loading component: ${error.message}</span>`;
-        });
-      }
-    }
-
-    // Initialize when DOM is loaded
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initializeComponents);
-    } else {
-      initializeComponents();
-    }
-    
-    // Also initialize when window fully loads (backup)
-    window.addEventListener("load", initializeComponents);
-  })();
-</script> 
+  
+  :global(.cm-s-monokai .CodeMirror-gutters) {
+    background-color: #272822;
+    border-right: 0;
+  }
+  
+  :global(.cm-s-monokai .CodeMirror-linenumber) {
+    color: #d0d0d0;
+  }
+</style> 

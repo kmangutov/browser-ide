@@ -6,14 +6,24 @@ let pyodideReadyPromise = null;
 
 // Detect the base URL for GitHub Pages compatibility
 const detectBasePath = () => {
-  // Try to get from the current script
+  // First try to get from the data-base-path attribute
   const scripts = document.getElementsByTagName('script');
   for (const script of scripts) {
+    const basePath = script.getAttribute('data-base-path');
+    if (basePath) {
+      return basePath;
+    }
+    
     const src = script.getAttribute('src') || '';
     if (src.includes('pyodide-loader.js')) {
       // Extract the base path from the script URL
       return src.substring(0, src.lastIndexOf('/js/pyodide-loader.js'));
     }
+  }
+  
+  // Try to get from import.meta.env (works in Astro)
+  if (window.astroAppReady) {
+    return window.astroAppReady.config.base || '';
   }
   
   // Fallback: try to get from meta tag

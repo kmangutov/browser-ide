@@ -1,156 +1,58 @@
 ---
-layout: ../../../layouts/BlogPostLayout.astro
-title: "Interactive Matplotlib Animations: Decision Boundaries (Part 2)"
-description: "Create interactive decision boundary visualizations directly in your browser with Python"
-date: 2023-04-12
-series: "interactive-animations"
+layout: '@/layouts/blog.astro'
+title: 'Decision Boundaries Visualization'
+description: 'Learn how to visualize decision tree boundaries with interactive animations'
+date: '2023-05-22'
+series: 'Interactive Animations'
 part: 2
-totalParts: 3
 ---
 
-import PyodideMatplotlib from '../../../components/PyodideMatplotlib.astro';
+import PyodideMatplotlib from '@/components/PyodideMatplotlib.astro';
+import MarkdownWrapper from '@/components/MarkdownWrapper.astro';
+import { Code } from 'astro:components';
+import { getEntry } from 'astro:content';
 
-# Interactive Matplotlib Animations: Decision Boundaries (Part 2)
+{/* Get the Python code file */}
+export const decision_tree = await getEntry('code', 'decision_tree');
 
-In the [first part](./1-introduction) of this series, we saw how to create a linear regression animation with Matplotlib in the browser. Now, let's explore a more complex example that visualizes decision boundaries in a classification problem.
+{/* Define code outside of JSX */}
+export const animationCode = decision_tree.body;
 
-## Example 2: Decision Boundaries Animation
+# Decision Boundaries Visualization
 
-This animation shows a decision tree splitting a feature space to classify points, illustrating how decision boundaries are formed:
+Decision trees split data recursively to classify samples. The visualization below shows how the decision boundaries evolve as the tree depth increases.
 
-<PyodideMatplotlib code={`import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
-from matplotlib.collections import PatchCollection
+## Interactive Tree Visualization
 
-class DecisionTreeAnimation(AnimationHelper):
-    def setup(self):
-        # Create figure and axis
-        self.fig, self.ax = plt.subplots(figsize=(8, 5))
-        self.ax.set_xlim(0, 10)
-        self.ax.set_ylim(0, 10)
-        self.ax.set_xlabel('Feature 1')
-        self.ax.set_ylabel('Feature 2')
-        self.ax.set_title('Decision Tree Boundary Animation')
-        
-        # Generate random data points for two classes
-        np.random.seed(42)
-        
-        # Class 1 (clustered in top-right)
-        self.class1_x = 5 + 2 * np.random.randn(15)
-        self.class1_y = 5 + 2 * np.random.randn(15)
-        
-        # Class 2 (clustered in bottom-left)
-        self.class2_x = 3 + 1.5 * np.random.randn(15)
-        self.class2_y = 3 + 1.5 * np.random.randn(15)
-        
-        # Animation phases
-        self.max_frames = 120
-        self.points_phase_end = 30
-        self.first_split_phase_end = 60
-        self.second_split_phase_end = 90
-        
-        # Initialize collections
-        self.class1_points = []
-        self.class2_points = []
-        self.split_lines = []
-        self.regions = []
-        
-        # Initialize figure
-        plt.tight_layout()
-        update_canvas(self.fig)
-    
-    def update(self, frame):
-        # Phase 1: Draw points
-        if frame < self.points_phase_end:
-            # Calculate how many points to show
-            n_class1 = min(int(frame * len(self.class1_x) / self.points_phase_end), len(self.class1_x))
-            n_class2 = min(int(frame * len(self.class2_x) / self.points_phase_end), len(self.class2_x))
-            
-            # Only add new points if needed
-            while len(self.class1_points) < n_class1:
-                idx = len(self.class1_points)
-                point, = self.ax.plot(self.class1_x[idx], self.class1_y[idx], 'o', color='blue', markersize=8)
-                self.class1_points.append(point)
-                
-            while len(self.class2_points) < n_class2:
-                idx = len(self.class2_points)
-                point, = self.ax.plot(self.class2_x[idx], self.class2_y[idx], 'o', color='red', markersize=8)
-                self.class2_points.append(point)
-                
-            if frame == self.points_phase_end - 1:
-                self.ax.text(7, 7, 'Class 1', color='blue', fontsize=12,
-                             bbox=dict(facecolor='white', alpha=0.7))
-                self.ax.text(3, 3, 'Class 2', color='red', fontsize=12,
-                             bbox=dict(facecolor='white', alpha=0.7))
-        
-        # Phase 2: First split (vertical line)
-        elif frame < self.first_split_phase_end:
-            # Draw the first decision boundary (x = 4.5)
-            if not self.split_lines:
-                line = self.ax.axvline(x=4.5, color='black', linestyle='--', linewidth=2)
-                self.split_lines.append(line)
-                
-                # Text annotation
-                self.ax.text(4.7, 9, 'First Split: x < 4.5', fontsize=10,
-                             bbox=dict(facecolor='white', alpha=0.7))
-                
-                # Add semi-transparent regions
-                rect1 = Rectangle((0, 0), 4.5, 10, alpha=0.2, color='red')
-                rect2 = Rectangle((4.5, 0), 5.5, 10, alpha=0.2, color='blue')
-                self.ax.add_patch(rect1)
-                self.ax.add_patch(rect2)
-                self.regions.extend([rect1, rect2])
-        
-        # Phase 3: Second split (horizontal line in left region)
-        elif frame < self.second_split_phase_end:
-            # Draw the second decision boundary (y = 5 but only for x < 4.5)
-            if len(self.split_lines) == 1:
-                line = self.ax.plot([0, 4.5], [5, 5], '--', color='black', linewidth=2)[0]
-                self.split_lines.append(line)
-                
-                # Text annotation
-                self.ax.text(1, 5.2, 'Second Split: y < 5', fontsize=10,
-                             bbox=dict(facecolor='white', alpha=0.7))
-                
-                # Update regions
-                for patch in self.regions:
-                    patch.remove()
-                self.regions = []
-                
-                # Create new regions with decision boundaries
-                rect1 = Rectangle((0, 0), 4.5, 5, alpha=0.2, color='red')
-                rect2 = Rectangle((0, 5), 4.5, 5, alpha=0.2, color='green')
-                rect3 = Rectangle((4.5, 0), 5.5, 10, alpha=0.2, color='blue')
-                
-                self.ax.add_patch(rect1)
-                self.ax.add_patch(rect2)
-                self.ax.add_patch(rect3)
-                self.regions.extend([rect1, rect2, rect3])
-        
-        # Final phase
-        else:
-            if frame == self.second_split_phase_end:
-                # Final text with accuracy
-                self.ax.text(1, 1, 'Class 2: 87% purity', color='white', fontsize=10,
-                            bbox=dict(facecolor='red', alpha=0.7))
-                self.ax.text(1, 8, 'Mixed region', color='black', fontsize=10,
-                            bbox=dict(facecolor='green', alpha=0.7))
-                self.ax.text(8, 5, 'Class 1: 93% purity', color='white', fontsize=10,
-                            bbox=dict(facecolor='blue', alpha=0.7))
-            
-            if frame >= self.max_frames - 1:
-                return False  # End animation
-        
-        return True  # Continue animation
+The animation shows how a decision tree creates boundaries that divide the feature space:
 
-# Create the animation instance
-animation = DecisionTreeAnimation()
-`} />
+<PyodideMatplotlib code={animationCode} fileName="decision_tree.py" height="400px" readOnly={true} />
 
-<div class="navigation-links">
-  <a href="1-introduction" class="prev-link">← Previous: Introduction</a>
-  <a href="3-create-your-own" class="next-link">Next: Create Your Own →</a>
+<MarkdownWrapper>
+
+## Understanding Tree Depth
+
+Notice how increasing the tree depth:
+
+1. Creates more complex decision boundaries
+2. Better fits the training data
+3. Can lead to overfitting when depth is too high
+
+The rectangular regions correspond to the rules created by the decision tree. Each split in the tree creates a new boundary, which results in these perpendicular lines.
+
+## How It Works
+
+The animation uses scikit-learn's `DecisionTreeClassifier` to:
+
+1. First show the data points for two classes
+2. Then visualize the decision boundary with increasing tree depth
+3. The boundary colors represent the predicted class for each region
+
+</MarkdownWrapper>
+
+<div className="navigation-links">
+  <a href="1-introduction" className="prev-link">← Previous: Introduction</a>
+  <a href="3-create-your-own" className="next-link">Next: Create Your Own →</a>
 </div>
 
 <style>

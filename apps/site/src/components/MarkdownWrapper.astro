@@ -1,0 +1,15 @@
+---
+// A simple wrapper component to help MDX parser distinguish between JSX and Markdown content
+// It simply renders its children with appropriate styling
+---
+
+<div class="markdown-content">
+  <slot />
+</div>
+
+<style>
+  .markdown-content {
+    /* Inherit styles from parent - this is just a semantic wrapper */
+    width: 100%;
+  }
+</style> 
