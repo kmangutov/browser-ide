@@ -23,10 +23,32 @@
   - Added explicit `.tolist()` conversion for all NumPy arrays
   - Added try/except error handling in Python code
   - Enhanced error display in the PyodideEmbed component
+- Fixed GitHub Pages deployment issues (branch 'debug'):
+  - Resolved 404 errors for JavaScript resources on GitHub Pages
+  - Modified script loading to use `is:inline` attribute in Astro components
+  - Updated Vite configuration in `astro.config.mjs` for proper asset path handling
+  - Added robust script initialization that works with both local and GitHub Pages environments
+  - Ensured scripts load correctly with the repository base path prefix
+
+## Branch Information
+- `debug`: Contains fixes for GitHub Pages compatibility issues
+- `beauty`: Works correctly in local development environment
+- `main`: Has GitHub Pages deployment issues but runs correctly locally
 
 ## Next Steps
-Test that we can deploy to gh-pages. Unclear since there are astro-specific ways, yet it should also just work from a gh-pages branch, yet chatgpt expects we can do it from main branch docs folder.
+- Merge 'debug' branch fixes into 'main' once verified
+- Create a more comprehensive testing workflow for GitHub Pages deployments
+- Consider documenting the GitHub Pages deployment process for future reference
 
+## GitHub Pages Issues Fixed
+- **Problem**: JavaScript 404 errors when deployed to GitHub Pages
+  - Scripts bundled by Astro weren't applying the base path correctly
+  - Animations failed to run when clicking buttons
+- **Solution**: 
+  - Made scripts inline using `is:inline` attribute
+  - Configured Vite to prevent asset inlining and ensure proper path prefixing
+  - Added multiple initialization hooks for better script loading reliability
+  - Used proper output naming with hashes for cache control
 
 - Install dependencies and test Astro development server
 - Test building the Astro site to the `/docs` directory

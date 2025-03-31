@@ -1,78 +1,20 @@
-<!DOCTYPE html><html lang="en" data-astro-cid-37fxchfa> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Learn how to create interactive animations using Python, NumPy, and Matplotlib that run directly in the browser"><title>Creating Interactive Python Animations with Pyodide</title><link rel="stylesheet" href="/browser-ide/assets/creating-pyodide-animations-COUoZuBW.css">
-<link rel="stylesheet" href="/browser-ide/assets/creating-pyodide-animations-D13ptpoQ.css">
-<link rel="stylesheet" href="/browser-ide/assets/creating-pyodide-animations-3o92PDWl.css"></head> <body data-astro-cid-37fxchfa> <!-- Navigation Bar --> <nav class="main-nav" data-astro-cid-37fxchfa> <ul data-astro-cid-37fxchfa> <li data-astro-cid-37fxchfa><a href="/browser-ide" class="" data-astro-cid-37fxchfa>Playground</a></li> <li data-astro-cid-37fxchfa><a href="/browser-ide/blog/" class="" data-astro-cid-37fxchfa>Blog</a></li> </ul> </nav> <main class="content" data-astro-cid-37fxchfa>  <article data-astro-cid-2q5oecfc> <header data-astro-cid-2q5oecfc> <h1 data-astro-cid-2q5oecfc>Creating Interactive Python Animations with Pyodide</h1>  </header> <div class="prose" data-astro-cid-2q5oecfc> <h1 id="creating-interactive-python-animations-with-pyodide">Creating Interactive Python Animations with Pyodide</h1>
-<p>This guide walks through creating interactive Python animations that run directly in your browser using Pyodide, NumPy, and Matplotlib. This is a simplified approach to create Manim-like animations without requiring server-side rendering.</p>
-<h2 id="overview">Overview</h2>
-<p>Our animation framework uses:</p>
-<ul>
-<li><strong>Pyodide</strong> - Run Python in the browser via WebAssembly</li>
-<li><strong>NumPy</strong> - For numerical computations</li>
-<li><strong>Matplotlib</strong> - For rendering visualizations</li>
-<li><strong>JavaScript</strong> - To handle animation loops and user interaction</li>
-</ul>
-<h2 id="the-pyodidematplotlib-component">The PyodideMatplotlib Component</h2>
-<p>The <code>PyodideMatplotlib</code> component handles:</p>
-<ol>
-<li>Loading the Pyodide runtime and required packages</li>
-<li>Rendering your Python code with syntax highlighting</li>
-<li>Providing animation controls (run, pause, reset)</li>
-<li>Executing your code and displaying the animation</li>
-</ol>
-<p>To use it in your MDX files, import the component and provide your Python code:</p>
-<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="jsx"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#E1E4E8"> PyodideMatplotlib </span><span style="color:#F97583">from</span><span style="color:#9ECBFF"> &#39;../../components/PyodideMatplotlib.astro&#39;</span><span style="color:#E1E4E8">;</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#E1E4E8">&lt;</span><span style="color:#79B8FF">PyodideMatplotlib</span><span style="color:#B392F0"> code</span><span style="color:#F97583">=</span><span style="color:#E1E4E8">{</span><span style="color:#9ECBFF">`</span></span>
-<span class="line"><span style="color:#9ECBFF"># Your Python animation code here</span></span>
-<span class="line"><span style="color:#9ECBFF">`</span><span style="color:#E1E4E8">} /&gt;</span></span>
-<span class="line"></span></code></pre>
-<h2 id="animation-framework">Animation Framework</h2>
-<p>Your code should define an <code>animation</code> object with these methods:</p>
-<ul>
-<li><code>setup()</code> - Runs once to initialize the animation</li>
-<li><code>update(frame)</code> - Called on each animation frame</li>
-<li><code>cleanup()</code> - Called when animation ends (optional)</li>
-</ul>
-<p>The component provides these helper functions:</p>
-<ul>
-<li><code>update_canvas()</code> - Renders the current Matplotlib figure to the canvas</li>
-<li><code>render_to_base64()</code> - Converts a figure to base64 for display</li>
-</ul>
-<h2 id="example-simple-sine-wave-animation">Example: Simple Sine Wave Animation</h2>
-<div class="pyodide-embed" data-component-id="pyodide_sz381bhl5" data-astro-cid-afk6wh7r> <div class="code-editor" data-astro-cid-afk6wh7r> <pre class="code-display" data-astro-cid-afk6wh7r>
-import numpy as np
-import matplotlib.pyplot as plt
+import { c as createAstro, a as createComponent, b as renderTemplate, d as addAttribute, m as maybeRenderHead } from './astro/server-BpiS1_cD.js';
+import 'kleur/colors';
+import 'html-escaper';
+import 'clsx';
+/* empty css                                              */
 
-class SineWaveAnimation(AnimationHelper):
-  def setup(self):
-      # Configure plot once
-      plt.figure(figsize=(10, 5))
-      self.x = np.linspace(0, 10, 1000)
-      self.max_frames = 120  # Animation length (frames)
-      
-  def update(self, frame):
-      # Clear previous frame
-      plt.clf()
-      
-      # Calculate phase based on frame
-      phase = 2 * np.pi * frame / 60
-      
-      # Generate sine wave with moving phase
-      y = np.sin(self.x + phase)
-      
-      # Plot and style
-      plt.plot(self.x, y, &#39;b-&#39;, linewidth=2)
-      plt.grid(True)
-      plt.ylim(-1.5, 1.5)
-      plt.title(f&quot;Sine Wave Animation (Frame {frame})&quot;)
-      plt.xlabel(&quot;x&quot;)
-      plt.ylabel(&quot;sin(x)&quot;)
-      
-      # Return True to continue animation
-      return frame &lt; self.max_frames
-
-# Assign to the animation object that the component expects
-animation = SineWaveAnimation()
-</pre> </div> <div class="controls" data-astro-cid-afk6wh7r> <button class="run-button" data-astro-cid-afk6wh7r>Run Animation</button> <button class="pause-button" disabled data-astro-cid-afk6wh7r>Pause</button> <button class="reset-button" disabled data-astro-cid-afk6wh7r>Reset</button> </div> <div class="visualization-container" data-astro-cid-afk6wh7r> <img class="output-canvas" id="outputCanvas_pyodide_sz381bhl5" width="800" height="500" data-astro-cid-afk6wh7r> </div> <div class="output-container" data-astro-cid-afk6wh7r> <div class="output-text" data-astro-cid-afk6wh7r></div> </div> </div>  <script>
+var __freeze = Object.freeze;
+var __defProp = Object.defineProperty;
+var __template = (cooked, raw) => __freeze(__defProp(cooked, "raw", { value: __freeze(raw || cooked.slice()) }));
+var _a;
+const $$Astro = createAstro("https://kmangutov.github.io");
+const $$PyodideMatplotlib = createComponent(async ($$result, $$props, $$slots) => {
+  const Astro2 = $$result.createAstro($$Astro, $$props, $$slots);
+  Astro2.self = $$PyodideMatplotlib;
+  const { code } = Astro2.props;
+  const uniqueId = `pyodide_${Math.random().toString(36).substr(2, 9)}`;
+  return renderTemplate(_a || (_a = __template(["", '<div class="pyodide-embed"', ' data-astro-cid-afk6wh7r> <div class="code-editor" data-astro-cid-afk6wh7r> <pre class="code-display" data-astro-cid-afk6wh7r>', '</pre> </div> <div class="controls" data-astro-cid-afk6wh7r> <button class="run-button" data-astro-cid-afk6wh7r>Run Animation</button> <button class="pause-button" disabled data-astro-cid-afk6wh7r>Pause</button> <button class="reset-button" disabled data-astro-cid-afk6wh7r>Reset</button> </div> <div class="visualization-container" data-astro-cid-afk6wh7r> <img class="output-canvas"', ` width="800" height="500" data-astro-cid-afk6wh7r> </div> <div class="output-container" data-astro-cid-afk6wh7r> <div class="output-text" data-astro-cid-afk6wh7r></div> </div> </div>  <script>
   // Use a self-executing function to ensure proper scoping
   (function() {
     // Global variable to assign pyodide to
@@ -100,7 +42,7 @@ animation = SineWaveAnimation()
           console.log("Packages loaded successfully!");
           
           // Configure matplotlib to use agg backend
-          await pyodide.runPythonAsync(`
+          await pyodide.runPythonAsync(\`
             import matplotlib
             matplotlib.use('agg')
             
@@ -117,7 +59,7 @@ animation = SineWaveAnimation()
                 buf.seek(0)
                 img_str = base64.b64encode(buf.getvalue()).decode('utf-8')
                 return f"data:image/png;base64,{img_str}"
-          `);
+          \`);
           
           return pyodide;
         })();
@@ -216,18 +158,18 @@ animation = SineWaveAnimation()
             
             pyodide.setStderr({
               write: (text) => {
-                capturedOutput += `\nError: ${text}`;
+                capturedOutput += \`\\nError: \${text}\`;
                 output.innerText = capturedOutput;
               }
             });
             
             // Add canvas binding helper with the specific canvas ID for this instance
-            await pyodide.runPythonAsync(`
+            await pyodide.runPythonAsync(\`
               import matplotlib.pyplot as plt
               from js import document
               
               # Get the output image element for this specific instance
-              canvas = document.getElementById('outputCanvas_${componentId}')
+              canvas = document.getElementById('outputCanvas_\${componentId}')
               
               # Helper function to update the canvas with matplotlib figure
               def update_canvas(fig=None):
@@ -259,14 +201,14 @@ animation = SineWaveAnimation()
               
               # Default animation helper
               animation = AnimationHelper()
-            `);
+            \`);
             
             // Execute the user code
             capturedOutput = "";
             await pyodide.runPythonAsync(userCode);
             
             // Start the animation loop
-            await pyodide.runPythonAsync(`
+            await pyodide.runPythonAsync(\`
               # Initialize the animation
               if hasattr(animation, 'setup'):
                   animation.setup()
@@ -285,7 +227,7 @@ animation = SineWaveAnimation()
                   return False
               
               animation.is_running = True
-            `);
+            \`);
             
             // Set up JS animation loop
             let frame = 0;
@@ -305,12 +247,12 @@ animation = SineWaveAnimation()
                     // Animation is complete or errored
                     cancelAnimationFrame(instanceState.animationFrameId);
                     instanceState.animationFrameId = null;
-                    output.innerText += "\nAnimation complete.";
+                    output.innerText += "\\nAnimation complete.";
                     return;
                   }
                   frame++;
                 } catch (error) {
-                  output.innerHTML += `\n<span class="error">Error in animation: ${error.message}</span>`;
+                  output.innerHTML += \`\\n<span class="error">Error in animation: \${error.message}</span>\`;
                   cancelAnimationFrame(instanceState.animationFrameId);
                   instanceState.animationFrameId = null;
                   return;
@@ -324,7 +266,7 @@ animation = SineWaveAnimation()
             output.innerText = "Animation running...";
             
           } catch (error) {
-            output.innerHTML = `<span class="error">Error: ${error.message || String(error)}</span>`;
+            output.innerHTML = \`<span class="error">Error: \${error.message || String(error)}</span>\`;
             console.error("Python execution error:", error);
             
             // Re-enable the run button and disable animation controls
@@ -341,7 +283,7 @@ animation = SineWaveAnimation()
             pyodidePromise.then(() => {
               output.innerText = "Python environment ready. Click 'Run Animation' to execute.";
             }).catch(error => {
-              output.innerText = `Error loading Python: ${error.message}`;
+              output.innerText = \`Error loading Python: \${error.message}\`;
               console.error("Failed to load Pyodide:", error);
             });
             observer.disconnect();
@@ -362,67 +304,7 @@ animation = SineWaveAnimation()
     // Also initialize when window fully loads (backup)
     window.addEventListener("load", initializeComponents);
   })();
-</script>
-<h2 id="example-advanced-gradient-descent-animation">Example: Advanced Gradient Descent Animation</h2>
-<div class="pyodide-embed" data-component-id="pyodide_d8n1rjus1" data-astro-cid-afk6wh7r> <div class="code-editor" data-astro-cid-afk6wh7r> <pre class="code-display" data-astro-cid-afk6wh7r>
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import cm
-
-class GradientDescentAnimation(AnimationHelper):
-  def setup(self):
-      # Create a simple 2D function to minimize: f(x,y) = x^2 + 3y^2
-      self.fig = plt.figure(figsize=(10, 6))
-      
-      # Create grid of x, y values
-      x = np.linspace(-2, 2, 100)
-      y = np.linspace(-2, 2, 100)
-      self.X, self.Y = np.meshgrid(x, y)
-      self.Z = self.X**2 + 3*self.Y**2  # Our function to minimize
-      
-      # Initial position and parameters
-      self.pos = np.array([-1.8, 1.5])  # Starting point
-      self.learning_rate = 0.1
-      self.path = [self.pos.copy()]
-      self.max_frames = 40
-      
-  def update(self, frame):
-      plt.clf()
-      
-      # Calculate gradient: [2x, 6y]
-      gradient = np.array([2*self.pos[0], 6*self.pos[1]])
-      
-      # Update position using gradient descent
-      if frame &gt; 0:
-          self.pos = self.pos - self.learning_rate * gradient
-          self.path.append(self.pos.copy())
-      
-      # Plot the function as a contour plot
-      plt.contourf(self.X, self.Y, self.Z, 30, cmap=cm.viridis)
-      plt.colorbar(label=&#39;f(x,y) = x² + 3y²&#39;)
-      
-      # Plot the path taken
-      path = np.array(self.path)
-      plt.plot(path[:,0], path[:,1], &#39;w-&#39;, linewidth=2)
-      plt.plot(path[:,0], path[:,1], &#39;o&#39;, color=&#39;orange&#39;, markersize=8)
-      
-      # Add current position with larger marker
-      plt.plot(self.pos[0], self.pos[1], &#39;o&#39;, color=&#39;red&#39;, markersize=10)
-      
-      # Add labels and info
-      plt.title(f&#39;Gradient Descent Animation (Step {frame})&#39;)
-      plt.xlabel(&#39;x&#39;)
-      plt.ylabel(&#39;y&#39;)
-      plt.grid(True)
-      plt.text(0.02, 0.05, f&#39;Position: ({self.pos[0]:.4f}, {self.pos[1]:.4f})&#39;, 
-              transform=plt.gca().transAxes, color=&#39;white&#39;, fontsize=10)
-      
-      # Return True to continue animation
-      return frame &lt; self.max_frames
-
-# Assign to the animation object that the component expects
-animation = GradientDescentAnimation()
-</pre> </div> <div class="controls" data-astro-cid-afk6wh7r> <button class="run-button" data-astro-cid-afk6wh7r>Run Animation</button> <button class="pause-button" disabled data-astro-cid-afk6wh7r>Pause</button> <button class="reset-button" disabled data-astro-cid-afk6wh7r>Reset</button> </div> <div class="visualization-container" data-astro-cid-afk6wh7r> <img class="output-canvas" id="outputCanvas_pyodide_d8n1rjus1" width="800" height="500" data-astro-cid-afk6wh7r> </div> <div class="output-container" data-astro-cid-afk6wh7r> <div class="output-text" data-astro-cid-afk6wh7r></div> </div> </div>  <script>
+<\/script>`], ["", '<div class="pyodide-embed"', ' data-astro-cid-afk6wh7r> <div class="code-editor" data-astro-cid-afk6wh7r> <pre class="code-display" data-astro-cid-afk6wh7r>', '</pre> </div> <div class="controls" data-astro-cid-afk6wh7r> <button class="run-button" data-astro-cid-afk6wh7r>Run Animation</button> <button class="pause-button" disabled data-astro-cid-afk6wh7r>Pause</button> <button class="reset-button" disabled data-astro-cid-afk6wh7r>Reset</button> </div> <div class="visualization-container" data-astro-cid-afk6wh7r> <img class="output-canvas"', ` width="800" height="500" data-astro-cid-afk6wh7r> </div> <div class="output-container" data-astro-cid-afk6wh7r> <div class="output-text" data-astro-cid-afk6wh7r></div> </div> </div>  <script>
   // Use a self-executing function to ensure proper scoping
   (function() {
     // Global variable to assign pyodide to
@@ -450,7 +332,7 @@ animation = GradientDescentAnimation()
           console.log("Packages loaded successfully!");
           
           // Configure matplotlib to use agg backend
-          await pyodide.runPythonAsync(`
+          await pyodide.runPythonAsync(\\\`
             import matplotlib
             matplotlib.use('agg')
             
@@ -467,7 +349,7 @@ animation = GradientDescentAnimation()
                 buf.seek(0)
                 img_str = base64.b64encode(buf.getvalue()).decode('utf-8')
                 return f"data:image/png;base64,{img_str}"
-          `);
+          \\\`);
           
           return pyodide;
         })();
@@ -566,18 +448,18 @@ animation = GradientDescentAnimation()
             
             pyodide.setStderr({
               write: (text) => {
-                capturedOutput += `\nError: ${text}`;
+                capturedOutput += \\\`\\\\nError: \\\${text}\\\`;
                 output.innerText = capturedOutput;
               }
             });
             
             // Add canvas binding helper with the specific canvas ID for this instance
-            await pyodide.runPythonAsync(`
+            await pyodide.runPythonAsync(\\\`
               import matplotlib.pyplot as plt
               from js import document
               
               # Get the output image element for this specific instance
-              canvas = document.getElementById('outputCanvas_${componentId}')
+              canvas = document.getElementById('outputCanvas_\\\${componentId}')
               
               # Helper function to update the canvas with matplotlib figure
               def update_canvas(fig=None):
@@ -609,14 +491,14 @@ animation = GradientDescentAnimation()
               
               # Default animation helper
               animation = AnimationHelper()
-            `);
+            \\\`);
             
             // Execute the user code
             capturedOutput = "";
             await pyodide.runPythonAsync(userCode);
             
             // Start the animation loop
-            await pyodide.runPythonAsync(`
+            await pyodide.runPythonAsync(\\\`
               # Initialize the animation
               if hasattr(animation, 'setup'):
                   animation.setup()
@@ -635,7 +517,7 @@ animation = GradientDescentAnimation()
                   return False
               
               animation.is_running = True
-            `);
+            \\\`);
             
             // Set up JS animation loop
             let frame = 0;
@@ -655,12 +537,12 @@ animation = GradientDescentAnimation()
                     // Animation is complete or errored
                     cancelAnimationFrame(instanceState.animationFrameId);
                     instanceState.animationFrameId = null;
-                    output.innerText += "\nAnimation complete.";
+                    output.innerText += "\\\\nAnimation complete.";
                     return;
                   }
                   frame++;
                 } catch (error) {
-                  output.innerHTML += `\n<span class="error">Error in animation: ${error.message}</span>`;
+                  output.innerHTML += \\\`\\\\n<span class="error">Error in animation: \\\${error.message}</span>\\\`;
                   cancelAnimationFrame(instanceState.animationFrameId);
                   instanceState.animationFrameId = null;
                   return;
@@ -674,7 +556,7 @@ animation = GradientDescentAnimation()
             output.innerText = "Animation running...";
             
           } catch (error) {
-            output.innerHTML = `<span class="error">Error: ${error.message || String(error)}</span>`;
+            output.innerHTML = \\\`<span class="error">Error: \\\${error.message || String(error)}</span>\\\`;
             console.error("Python execution error:", error);
             
             // Re-enable the run button and disable animation controls
@@ -691,7 +573,7 @@ animation = GradientDescentAnimation()
             pyodidePromise.then(() => {
               output.innerText = "Python environment ready. Click 'Run Animation' to execute.";
             }).catch(error => {
-              output.innerText = `Error loading Python: ${error.message}`;
+              output.innerText = \\\`Error loading Python: \\\${error.message}\\\`;
               console.error("Failed to load Pyodide:", error);
             });
             observer.disconnect();
@@ -712,66 +594,7 @@ animation = GradientDescentAnimation()
     // Also initialize when window fully loads (backup)
     window.addEventListener("load", initializeComponents);
   })();
-</script>
-<h2 id="how-it-works">How It Works</h2>
-<h3 id="component-implementation">Component Implementation</h3>
-<p>The <code>PyodideMatplotlib.astro</code> component handles the complexity of running Python in the browser:</p>
-<ol>
-<li><strong>Setup</strong>: Creates a unique ID for each component instance on the page</li>
-<li><strong>Loading</strong>: Loads Pyodide runtime and required packages</li>
-<li><strong>Animation Loop</strong>: Manages the JavaScript animation loop that calls your Python functions</li>
-<li><strong>Rendering</strong>: Converts Matplotlib figures to images that can be displayed</li>
-</ol>
-<h3 id="technical-details">Technical Details</h3>
-<p>The component:</p>
-<ol>
-<li>Uses Pyodide to run Python code in WebAssembly</li>
-<li>Creates a unique namespace for each animation component</li>
-<li>Captures stdout/stderr for debugging</li>
-<li>Uses <code>requestAnimationFrame</code> for smooth animations</li>
-<li>Renders Matplotlib figures using the ‘agg’ backend and converts to base64 images</li>
-<li>Provides play/pause/reset controls</li>
-</ol>
-<h2 id="technical-considerations">Technical Considerations</h2>
-<h3 id="canvas-rendering">Canvas Rendering</h3>
-<p>We use the ‘agg’ backend for Matplotlib which renders to a PNG buffer:</p>
-<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="python"><code><span class="line"><span style="color:#F97583">def</span><span style="color:#B392F0"> render_to_base64</span><span style="color:#E1E4E8">(fig</span><span style="color:#F97583">=</span><span style="color:#79B8FF">None</span><span style="color:#E1E4E8">):</span></span>
-<span class="line"><span style="color:#F97583">    if</span><span style="color:#E1E4E8"> fig </span><span style="color:#F97583">is</span><span style="color:#79B8FF"> None</span><span style="color:#E1E4E8">:</span></span>
-<span class="line"><span style="color:#E1E4E8">        fig </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> plt.gcf()</span></span>
-<span class="line"><span style="color:#E1E4E8">    buf </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> io.BytesIO()</span></span>
-<span class="line"><span style="color:#E1E4E8">    fig.savefig(buf, </span><span style="color:#FFAB70">format</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">&#39;png&#39;</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">dpi</span><span style="color:#F97583">=</span><span style="color:#79B8FF">100</span><span style="color:#E1E4E8">, </span><span style="color:#FFAB70">bbox_inches</span><span style="color:#F97583">=</span><span style="color:#9ECBFF">&#39;tight&#39;</span><span style="color:#E1E4E8">)</span></span>
-<span class="line"><span style="color:#E1E4E8">    buf.seek(</span><span style="color:#79B8FF">0</span><span style="color:#E1E4E8">)</span></span>
-<span class="line"><span style="color:#E1E4E8">    img_str </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> base64.b64encode(buf.getvalue()).decode(</span><span style="color:#9ECBFF">&#39;utf-8&#39;</span><span style="color:#E1E4E8">)</span></span>
-<span class="line"><span style="color:#F97583">    return</span><span style="color:#F97583"> f</span><span style="color:#9ECBFF">&quot;data:image/png;base64,</span><span style="color:#79B8FF">{</span><span style="color:#E1E4E8">img_str</span><span style="color:#79B8FF">}</span><span style="color:#9ECBFF">&quot;</span></span>
-<span class="line"></span></code></pre>
-<h3 id="multiple-components">Multiple Components</h3>
-<p>Each component instance:</p>
-<ul>
-<li>Has a unique ID (<code>pyodide_XXXXXXXXX</code>)</li>
-<li>Uses its own output element</li>
-<li>Maintains separate animation state</li>
-</ul>
-<h3 id="memory-management">Memory Management</h3>
-<p>For long-running animations, consider:</p>
-<ul>
-<li>Limiting the number of frames</li>
-<li>Using <code>plt.clf()</code> to clear figures</li>
-<li>Using the <code>cleanup()</code> method to free resources</li>
-</ul>
-<h2 id="troubleshooting">Troubleshooting</h2>
-<p>Common issues:</p>
-<ol>
-<li><strong>Animation not showing</strong>: Check your Python code for errors in the output console</li>
-<li><strong>Performance issues</strong>: Reduce the complexity of your plots or increase frame delay</li>
-<li><strong>Memory leaks</strong>: Make sure to clear figures between frames with <code>plt.clf()</code></li>
-</ol>
-<h2 id="future-enhancements">Future Enhancements</h2>
-<p>Possible improvements:</p>
-<ol>
-<li>Add support for interactive widgets (sliders, buttons)</li>
-<li>Implement caching for faster restarts</li>
-<li>Add a code editor for live modifications</li>
-<li>Support multiple canvases per animation</li>
-</ol>
-<hr/>
-<p>Now you can create interactive, educational animations that run directly in the browser without requiring a server or complex build process. This approach is ideal for educational content, interactive demos, or visualizing algorithms.</p> </div> </article>   </main> </body></html>
+<\/script>`])), maybeRenderHead(), addAttribute(uniqueId, "data-component-id"), code, addAttribute(`outputCanvas_${uniqueId}`, "id"));
+}, "/Users/kmangutov/idetest/apps/site/src/components/PyodideMatplotlib.astro", void 0);
+
+export { $$PyodideMatplotlib as $ };

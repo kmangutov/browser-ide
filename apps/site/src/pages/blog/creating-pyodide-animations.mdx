@@ -1,439 +1,229 @@
 ---
 layout: ../../layouts/BlogPostLayout.astro
-title: "Creating Interactive Python Animations with Pyodide"
-description: "Learn how to create interactive matplotlib animations that run directly in the browser using Python, NumPy, and Matplotlib via Pyodide"
-date: 2023-04-15
+title: Creating Interactive Python Animations with Pyodide
+publishDate: 2023-09-17
+description: Learn how to create interactive animations using Python, NumPy, and Matplotlib that run directly in the browser
+author: Your Name
 ---
 
 import PyodideMatplotlib from '../../components/PyodideMatplotlib.astro';
 
 # Creating Interactive Python Animations with Pyodide
 
-This guide explains how to create interactive Python animations that run directly in your browser using Pyodide - a WebAssembly-based Python runtime. By combining Pyodide with NumPy and Matplotlib, you can create engaging, interactive visualizations for teaching data science and machine learning concepts without requiring any installation from your users.
+This guide walks through creating interactive Python animations that run directly in your browser using Pyodide, NumPy, and Matplotlib. This is a simplified approach to create Manim-like animations without requiring server-side rendering.
 
-## What You'll Learn
+## Overview
 
-- How to set up the Pyodide environment in an Astro site
-- How to create frame-by-frame animations with Matplotlib
-- How to structure animation code for maintainability
-- Common pitfalls and how to avoid them
+Our animation framework uses:
+
+- **Pyodide** - Run Python in the browser via WebAssembly
+- **NumPy** - For numerical computations
+- **Matplotlib** - For rendering visualizations
+- **JavaScript** - To handle animation loops and user interaction
 
 ## The PyodideMatplotlib Component
 
-The core of our animation system is the `PyodideMatplotlib.astro` component. This component handles:
+The `PyodideMatplotlib` component handles:
 
 1. Loading the Pyodide runtime and required packages
-2. Rendering Python code as editable content
-3. Providing animation controls (play/pause/reset)
-4. Executing the Python code when the user clicks "Run Animation"
-5. Rendering the animation output to an image element
+2. Rendering your Python code with syntax highlighting
+3. Providing animation controls (run, pause, reset)
+4. Executing your code and displaying the animation
 
-Here's how to use it in your MDX files:
+To use it in your MDX files, import the component and provide your Python code:
 
-```astro
+```jsx
 import PyodideMatplotlib from '../../components/PyodideMatplotlib.astro';
 
 <PyodideMatplotlib code={`
 # Your Python animation code here
-import numpy as np
-import matplotlib.pyplot as plt
-
-class MyAnimation(AnimationHelper):
-    def setup(self):
-        # Initialize your visualization
-        pass
-        
-    def update(self, frame):
-        # Update for each animation frame
-        return True
-        
-animation = MyAnimation()
 `} />
 ```
 
-## The Animation Framework
+## Animation Framework
 
-Our animation system uses a simple but powerful framework inspired by Manim. Each animation is encapsulated in a class that inherits from `AnimationHelper` and implements these key methods:
+Your code should define an `animation` object with these methods:
 
-- `setup()`: Initializes the visualization (runs once)
-- `update(frame)`: Updates the visualization for each frame
-- `cleanup()`: Optional cleanup after animation completes
+- `setup()` - Runs once to initialize the animation
+- `update(frame)` - Called on each animation frame
+- `cleanup()` - Called when animation ends (optional)
 
-### Animation Lifecycle
+The component provides these helper functions:
 
-1. When the user clicks "Run Animation", the system:
-   - Loads Pyodide and required packages
-   - Executes the Python code
-   - Calls `animation.setup()`
-   - Begins calling `animation.update(frame)` repeatedly for each animation frame
-
-2. The animation continues until:
-   - `update()` returns `False`
-   - The maximum frame count is reached
-   - An error occurs
-   - The user clicks "Reset"
+- `update_canvas()` - Renders the current Matplotlib figure to the canvas
+- `render_to_base64()` - Converts a figure to base64 for display
 
 ## Example: Simple Sine Wave Animation
 
-Here's a basic example that animates a sine wave:
-
-<PyodideMatplotlib code={`import numpy as np
+<PyodideMatplotlib code={`
+import numpy as np
 import matplotlib.pyplot as plt
 
 class SineWaveAnimation(AnimationHelper):
     def setup(self):
-        # Create figure and axis
-        self.fig, self.ax = plt.subplots(figsize=(8, 5))
-        self.ax.set_xlim(0, 2*np.pi)
-        self.ax.set_ylim(-1.5, 1.5)
-        self.ax.set_xlabel('x')
-        self.ax.set_ylabel('sin(x)')
-        self.ax.set_title('Sine Wave Animation')
-        self.ax.grid(True)
+        # Configure plot once
+        plt.figure(figsize=(10, 5))
+        self.x = np.linspace(0, 10, 1000)
+        self.max_frames = 120  # Animation length (frames)
         
-        # Create the line with empty data initially
-        self.line, = self.ax.plot([], [], 'b-', linewidth=2)
-        
-        # Animation parameters
-        self.max_frames = 100
-        
-        # Initialize figure
-        plt.tight_layout()
-        update_canvas(self.fig)
-    
     def update(self, frame):
-        # Calculate progress (0 to 1)
-        progress = frame / self.max_frames
+        # Clear previous frame
+        plt.clf()
         
-        # Generate points up to current position
-        x_max = 2 * np.pi * progress
-        x = np.linspace(0, x_max, 100)
-        y = np.sin(x)
+        # Calculate phase based on frame
+        phase = 2 * np.pi * frame / 60
         
-        # Update line data
-        self.line.set_data(x, y)
+        # Generate sine wave with moving phase
+        y = np.sin(self.x + phase)
         
-        # End animation when we reach max_frames
-        if frame >= self.max_frames - 1:
-            return False
-            
-        return True
+        # Plot and style
+        plt.plot(self.x, y, 'b-', linewidth=2)
+        plt.grid(True)
+        plt.ylim(-1.5, 1.5)
+        plt.title(f"Sine Wave Animation (Frame {frame})")
+        plt.xlabel("x")
+        plt.ylabel("sin(x)")
+        
+        # Return True to continue animation
+        return frame < self.max_frames
 
-# Create the animation instance
+# Assign to the animation object that the component expects
 animation = SineWaveAnimation()
 `} />
 
-## Example: Advanced Animation with Phases
+## Example: Advanced Gradient Descent Animation
 
-Here's a more complex example that demonstrates different animation phases:
-
-<PyodideMatplotlib code={`import numpy as np
+<PyodideMatplotlib code={`
+import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import cm
 
 class GradientDescentAnimation(AnimationHelper):
     def setup(self):
-        # Create figure and axis
-        self.fig, self.ax = plt.subplots(figsize=(8, 5))
-        self.ax.set_xlim(-5, 5)
-        self.ax.set_ylim(-1, 30)
-        self.ax.set_xlabel('x')
-        self.ax.set_ylabel('f(x)')
-        self.ax.set_title('Gradient Descent Animation')
+        # Create a simple 2D function to minimize: f(x,y) = x^2 + 3y^2
+        self.fig = plt.figure(figsize=(10, 6))
         
-        # Define the function: f(x) = x² + 5
-        x = np.linspace(-5, 5, 1000)
-        y = x**2 + 5
-        self.ax.plot(x, y, 'b-', linewidth=2)
+        # Create grid of x, y values
+        x = np.linspace(-2, 2, 100)
+        y = np.linspace(-2, 2, 100)
+        self.X, self.Y = np.meshgrid(x, y)
+        self.Z = self.X**2 + 3*self.Y**2  # Our function to minimize
         
-        # Starting point at x = 4
-        self.current_x = 4.0
-        self.current_y = self.current_x**2 + 5
-        self.point, = self.ax.plot([self.current_x], [self.current_y], 'ro', markersize=10)
-        
-        # Store history for visualization
-        self.history_x = [self.current_x]
-        self.history_y = [self.current_y]
-        self.path, = self.ax.plot(self.history_x, self.history_y, 'r--', alpha=0.5)
-        
-        # Gradient descent parameters
+        # Initial position and parameters
+        self.pos = np.array([-1.8, 1.5])  # Starting point
         self.learning_rate = 0.1
+        self.path = [self.pos.copy()]
+        self.max_frames = 40
         
-        # Animation parameters
-        self.max_frames = 100
-        self.steps_phase_end = 70
-        self.learning_rate_text = self.ax.text(-4, 25, f"Learning Rate: {self.learning_rate}", 
-                                          bbox=dict(facecolor='white', alpha=0.7))
-        
-        # Add a grid
-        self.ax.grid(True, alpha=0.3)
-        
-        # Initialize figure
-        plt.tight_layout()
-        update_canvas(self.fig)
-    
     def update(self, frame):
-        # Phase 1: Gradient descent steps
-        if frame < self.steps_phase_end:
-            # Calculate gradient of f(x) = x² + 5 at current_x
-            # df/dx = 2x
-            gradient = 2 * self.current_x
-            
-            # Update position with gradient descent
-            self.current_x = self.current_x - self.learning_rate * gradient
-            self.current_y = self.current_x**2 + 5
-            
-            # Update point position
-            self.point.set_data([self.current_x], [self.current_y])
-            
-            # Add to history
-            self.history_x.append(self.current_x)
-            self.history_y.append(self.current_y)
-            self.path.set_data(self.history_x, self.history_y)
-            
-        # Phase 2: Show final result
-        elif frame == self.steps_phase_end:
-            # Add final position text
-            self.ax.text(self.current_x + 0.5, self.current_y, 
-                    f"Final: x={self.current_x:.2f}, f(x)={self.current_y:.2f}",
-                    bbox=dict(facecolor='white', alpha=0.7))
+        plt.clf()
         
-        # End animation when we reach max_frames
-        if frame >= self.max_frames - 1:
-            return False
-            
-        return True
+        # Calculate gradient: [2x, 6y]
+        gradient = np.array([2*self.pos[0], 6*self.pos[1]])
+        
+        # Update position using gradient descent
+        if frame > 0:
+            self.pos = self.pos - self.learning_rate * gradient
+            self.path.append(self.pos.copy())
+        
+        # Plot the function as a contour plot
+        plt.contourf(self.X, self.Y, self.Z, 30, cmap=cm.viridis)
+        plt.colorbar(label='f(x,y) = x² + 3y²')
+        
+        # Plot the path taken
+        path = np.array(self.path)
+        plt.plot(path[:,0], path[:,1], 'w-', linewidth=2)
+        plt.plot(path[:,0], path[:,1], 'o', color='orange', markersize=8)
+        
+        # Add current position with larger marker
+        plt.plot(self.pos[0], self.pos[1], 'o', color='red', markersize=10)
+        
+        # Add labels and info
+        plt.title(f'Gradient Descent Animation (Step {frame})')
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.grid(True)
+        plt.text(0.02, 0.05, f'Position: ({self.pos[0]:.4f}, {self.pos[1]:.4f})', 
+                transform=plt.gca().transAxes, color='white', fontsize=10)
+        
+        # Return True to continue animation
+        return frame < self.max_frames
 
-# Create the animation instance
+# Assign to the animation object that the component expects
 animation = GradientDescentAnimation()
 `} />
 
-## Component Implementation Details
+## How It Works
 
-Here's a simplified version of the PyodideMatplotlib component:
+### Component Implementation
 
-```astro
----
-const { code } = Astro.props;
-// Generate a unique ID for this component instance
-const uniqueId = `pyodide_${Math.random().toString(36).substr(2, 9)}`;
----
+The `PyodideMatplotlib.astro` component handles the complexity of running Python in the browser:
 
-<div class="pyodide-embed" data-component-id={uniqueId}>
-  <div class="code-editor">
-    <pre class="code-display">{code}</pre>
-  </div>
-  <div class="controls">
-    <button class="run-button">Run Animation</button>
-    <button class="pause-button" disabled>Pause</button>
-    <button class="reset-button" disabled>Reset</button>
-  </div>
-  <div class="visualization-container">
-    <img class="output-canvas" id={`outputCanvas_${uniqueId}`} width="800" height="500">
-  </div>
-  <div class="output-container">
-    <div class="output-text"></div>
-  </div>
-</div>
+1. **Setup**: Creates a unique ID for each component instance on the page
+2. **Loading**: Loads Pyodide runtime and required packages
+3. **Animation Loop**: Manages the JavaScript animation loop that calls your Python functions
+4. **Rendering**: Converts Matplotlib figures to images that can be displayed
 
-<script>
-  // Load Pyodide and initialize the Python environment
-  async function initializePyodide() {
-    // ... Pyodide loading code ...
-    
-    // Configure matplotlib to use agg backend
-    await pyodide.runPythonAsync(`
-      import matplotlib
-      matplotlib.use('agg')
-      
-      # Set up functions for rendering to base64
-      import matplotlib.pyplot as plt
-      import io
-      import base64
-      
-      def render_to_base64(fig=None):
-          if fig is None:
-              fig = plt.gcf()
-          buf = io.BytesIO()
-          fig.savefig(buf, format='png', dpi=100, bbox_inches='tight')
-          buf.seek(0)
-          img_str = base64.b64encode(buf.getvalue()).decode('utf-8')
-          return f"data:image/png;base64,{img_str}"
-    `);
-    
-    // ... more initialization ...
-  }
+### Technical Details
 
-  // Set up each component on the page
-  document.addEventListener('DOMContentLoaded', () => {
-    const containers = document.querySelectorAll('.pyodide-embed');
-    
-    containers.forEach((container) => {
-      // ... control setup ...
-      
-      // When the user clicks Run
-      runButton.addEventListener('click', async () => {
-        // ... setup code ...
-        
-        // Add animation helper class and canvas connection
-        await pyodide.runPythonAsync(`
-          import matplotlib.pyplot as plt
-          from js import document
-          
-          # Get the output image element for this specific instance
-          canvas = document.getElementById('outputCanvas_${componentId}')
-          
-          # Helper function to update the canvas with matplotlib figure
-          def update_canvas(fig=None):
-              if fig is None:
-                  fig = plt.gcf()
-              # Render figure to base64 PNG and update image src
-              img_data = render_to_base64(fig)
-              canvas.src = img_data
-              
-          # Create animation helpers
-          class AnimationHelper:
-              def __init__(self):
-                  self.frame = 0
-                  self.max_frames = 100
-                  
-              def setup(self):
-                  # Override in user code
-                  pass
-                  
-              def update(self, frame):
-                  # Override in user code
-                  pass
-          
-          # Default animation helper
-          animation = AnimationHelper()
-        `);
-        
-        // ... animation loop setup ...
-      });
-    });
-  });
-</script>
-```
+The component:
 
-## Technical Considerations and Best Practices
+1. Uses Pyodide to run Python code in WebAssembly
+2. Creates a unique namespace for each animation component
+3. Captures stdout/stderr for debugging
+4. Uses `requestAnimationFrame` for smooth animations
+5. Renders Matplotlib figures using the 'agg' backend and converts to base64 images
+6. Provides play/pause/reset controls
 
-### 1. Canvas Rendering
+## Technical Considerations
 
-We use Matplotlib's 'agg' backend to render plots to PNG images, which are then displayed in an `<img>` element. This approach is more compatible with Pyodide than trying to use HTML Canvas directly.
+### Canvas Rendering
+
+We use the 'agg' backend for Matplotlib which renders to a PNG buffer:
 
 ```python
-# Configure matplotlib to use the agg backend (headless rendering)
-import matplotlib
-matplotlib.use('agg')
-
-# Render to base64-encoded PNG
-buf = io.BytesIO()
-fig.savefig(buf, format='png', dpi=100, bbox_inches='tight')
-buf.seek(0)
-img_str = base64.b64encode(buf.getvalue()).decode('utf-8')
-data_url = f"data:image/png;base64,{img_str}"
+def render_to_base64(fig=None):
+    if fig is None:
+        fig = plt.gcf()
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png', dpi=100, bbox_inches='tight')
+    buf.seek(0)
+    img_str = base64.b64encode(buf.getvalue()).decode('utf-8')
+    return f"data:image/png;base64,{img_str}"
 ```
 
-### 2. Multiple Components on One Page
+### Multiple Components
 
-Each PyodideMatplotlib component needs a unique identifier to avoid conflicts. We generate a random ID for each component instance and use it for the canvas element:
+Each component instance:
+- Has a unique ID (`pyodide_XXXXXXXXX`)
+- Uses its own output element
+- Maintains separate animation state
 
-```javascript
-const uniqueId = `pyodide_${Math.random().toString(36).substr(2, 9)}`;
-```
+### Memory Management
 
-And then reference it in both HTML:
+For long-running animations, consider:
 
-```html
-<img class="output-canvas" id={`outputCanvas_${uniqueId}`} width="800" height="500">
-```
+- Limiting the number of frames
+- Using `plt.clf()` to clear figures
+- Using the `cleanup()` method to free resources
 
-And JavaScript:
+## Troubleshooting
 
-```javascript
-canvas = document.getElementById('outputCanvas_${componentId}')
-```
+Common issues:
 
-### 3. Animation Loop
-
-The animation loop uses `requestAnimationFrame` for smooth animations:
-
-```javascript
-function animationLoop() {
-  if (!instanceState.animationPaused) {
-    // Call Python animation update function
-    const result = pyodideGlobal(frame);
-    const shouldContinue = typeof result.toJs === 'function' ? result.toJs() : result;
-    
-    if (!shouldContinue) {
-      // Animation complete
-      cancelAnimationFrame(instanceState.animationFrameId);
-      return;
-    }
-    frame++;
-  }
-  
-  // Schedule next frame
-  instanceState.animationFrameId = requestAnimationFrame(animationLoop);
-}
-```
-
-### 4. Memory Management
-
-Clear references to avoid memory leaks:
-
-```javascript
-resetButton.addEventListener('click', async () => {
-  // Cancel animation
-  if (instanceState.animationFrameId) {
-    cancelAnimationFrame(instanceState.animationFrameId);
-    instanceState.animationFrameId = null;
-  }
-  
-  // Clear the canvas
-  canvas.src = '';
-});
-```
-
-## Troubleshooting Common Issues
-
-### "result.toJs is not a function" Error
-
-This error occurs when Pyodide automatically converts Python values to JavaScript values, but the code tries to call `toJs()` on them. Use this pattern to handle both cases:
-
-```javascript
-const shouldContinue = typeof result.toJs === 'function' ? result.toJs() : result;
-```
-
-### Multiple Animations Using the Same Canvas
-
-If multiple animations render to the same canvas, ensure each component has a unique ID:
-
-```javascript
-const uniqueId = `pyodide_${Math.random().toString(36).substr(2, 9)}`;
-```
-
-### Matplotlib Backend Errors
-
-Always use the 'agg' backend with Pyodide:
-
-```python
-import matplotlib
-matplotlib.use('agg')
-```
-
-Don't try to use interactive backends like 'module://matplotlib.backends.html5_canvas_backend' as they're not fully supported in Pyodide.
+1. **Animation not showing**: Check your Python code for errors in the output console
+2. **Performance issues**: Reduce the complexity of your plots or increase frame delay
+3. **Memory leaks**: Make sure to clear figures between frames with `plt.clf()`
 
 ## Future Enhancements
 
-Some possible enhancements to consider:
+Possible improvements:
 
-1. **Code Editor**: Add a live code editor so users can modify animations
-2. **Performance Optimizations**: Optimize rendering for more complex animations
-3. **Interactivity**: Add sliders, buttons, and other UI controls for interactive demos
+1. Add support for interactive widgets (sliders, buttons)
+2. Implement caching for faster restarts
+3. Add a code editor for live modifications
+4. Support multiple canvases per animation
 
-## Conclusion
+---
 
-Using Pyodide with Matplotlib provides a powerful way to create interactive animations that run directly in the browser. This approach offers the expressiveness and ecosystem of Python with the accessibility of web-based content.
-
-By following the patterns in this guide, you can create engaging, educational animations for teaching data science and machine learning concepts without requiring your users to install any software. 
+Now you can create interactive, educational animations that run directly in the browser without requiring a server or complex build process. This approach is ideal for educational content, interactive demos, or visualizing algorithms. 
