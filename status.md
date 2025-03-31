@@ -25,6 +25,9 @@
   - Enhanced error display in the PyodideEmbed component
 
 ## Next Steps
+Test that we can deploy to gh-pages. Unclear since there are astro-specific ways, yet it should also just work from a gh-pages branch, yet chatgpt expects we can do it from main branch docs folder.
+
+
 - Install dependencies and test Astro development server
 - Test building the Astro site to the `/docs` directory
 - Add more blog content over time
