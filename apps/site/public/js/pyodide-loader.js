@@ -4,6 +4,58 @@
 // Cache the pyodide loading promise globally
 let pyodideReadyPromise = null;
 
+// Detect the base URL for GitHub Pages compatibility
+const detectBasePath = () => {
+  // Try to get from the current script
+  const scripts = document.getElementsByTagName('script');
+  for (const script of scripts) {
+    const src = script.getAttribute('src') || '';
+    if (src.includes('pyodide-loader.js')) {
+      // Extract the base path from the script URL
+      return src.substring(0, src.lastIndexOf('/js/pyodide-loader.js'));
+    }
+  }
+  
+  // Fallback: try to get from meta tag
+  const baseUrlMeta = document.querySelector('meta[name="base-url"]');
+  if (baseUrlMeta) {
+    const baseUrl = baseUrlMeta.getAttribute('content') || '';
+    // Ensure it doesn't end with a slash
+    return baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  }
+  
+  // Default to empty string (relative paths)
+  return '';
+};
+
+// Get the base path for all assets
+const basePath = detectBasePath();
+
+/**
+ * Resolves a path relative to the base path
+ * @param {string} path - Path to resolve
+ * @returns {string} - Resolved path
+ */
+export function resolvePath(path) {
+  // If the path already starts with the base path or is absolute, return as is
+  if (path.startsWith(basePath) || path.startsWith('http') || path.startsWith('/')) {
+    return path;
+  }
+  
+  // Remove leading slash if present in both base path and path
+  if (basePath.endsWith('/') && path.startsWith('/')) {
+    return `${basePath}${path.substring(1)}`;
+  }
+  
+  // Add slash if neither has one
+  if (!basePath.endsWith('/') && !path.startsWith('/')) {
+    return `${basePath}/${path}`;
+  }
+  
+  // Otherwise just concatenate
+  return `${basePath}${path}`;
+}
+
 /**
  * Initializes Pyodide with the specified packages
  * @param {Array<string>} packages - Array of packages to load
@@ -40,6 +92,24 @@ export async function initPyodide(packages = []) {
   }
   
   return pyodideReadyPromise;
+}
+
+/**
+ * Creates a PyodideManager instance with the correct paths
+ * @param {Object} config - Configuration options
+ * @returns {Promise<PyodideManager>} - The PyodideManager instance
+ */
+export async function createPyodideManager(config = {}) {
+  // Load the PyodideManager class
+  const { PyodideManager } = await import(resolvePath('/js/pyodide-manager.js'));
+  
+  // Create and return a configured instance
+  return new PyodideManager({
+    workerUrl: resolvePath('/js/pyodide-worker.js'),
+    packages: ['matplotlib', 'numpy'],
+    targetFps: 30,
+    ...config
+  });
 }
 
 /**
