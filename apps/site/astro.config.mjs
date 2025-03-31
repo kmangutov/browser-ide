@@ -2,13 +2,13 @@ import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import rehypePrettyCode from 'rehype-pretty-code';
 
-// Detect if we're in production (GitHub Pages) or development
-const isProduction = process.env.NODE_ENV === 'production';
+// GitHub Pages configuration with repository name
+const REPO_NAME = 'browser-ide'; // ← replace with your actual repo name
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://your-github-username.github.io',
-  base: isProduction ? '/browser-ide/' : '/',
+  base: `/${REPO_NAME}`,
   outDir: '../../docs',
   integrations: [
     mdx()

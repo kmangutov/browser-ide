@@ -1,5 +1,8 @@
 ---
 const { title, description } = Astro.props;
+const baseUrl = import.meta.env.BASE_URL;
+// Ensure baseUrl ends with a slash
+const basePath = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
 ---
 
 <!DOCTYPE html>
@@ -77,8 +80,8 @@ const { title, description } = Astro.props;
   <!-- Navigation Bar -->
   <nav class="main-nav">
     <ul>
-      <li><a href="/" class={Astro.url.pathname === "/" ? "active" : ""}>Playground</a></li>
-      <li><a href="/blog/" class={Astro.url.pathname.startsWith("/blog") ? "active" : ""}>Blog</a></li>
+      <li><a href={baseUrl} class={Astro.url.pathname === baseUrl || Astro.url.pathname === "/" ? "active" : ""}>Playground</a></li>
+      <li><a href={`${basePath}blog/`} class={Astro.url.pathname.startsWith(`${baseUrl}blog`) || Astro.url.pathname.startsWith("/blog") ? "active" : ""}>Blog</a></li>
     </ul>
   </nav>
   

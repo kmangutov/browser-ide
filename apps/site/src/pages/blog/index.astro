@@ -1,9 +1,40 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { navLink } from '../../utils/paths.js';
+const baseUrl = import.meta.env.BASE_URL;
+// Ensure baseUrl ends with a slash
+const basePath = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+// Get repository name without slashes for checking
+const repoName = baseUrl.replace(/\//g, '');
 
-// Get all blog posts
-const posts = await Astro.glob('./*.mdx');
+// Get all blog posts in the root blog directory
+const rootPosts = await Astro.glob('./*.mdx');
+
+// Get all ML story posts and sort them by number
+const mlStoryPosts = await Astro.glob('./ml-story/*.mdx');
+const sortedMlStoryPosts = mlStoryPosts
+  .filter(post => !post.url.includes('test-manim'))
+  .sort((a, b) => {
+    const aNum = parseInt(a.url.split('/').pop().split('-')[0]) || 0;
+    const bNum = parseInt(b.url.split('/').pop().split('-')[0]) || 0;
+    return aNum - bNum;
+  });
+
+// Function to ensure URL has correct base path without duplication
+function fixUrl(url) {
+  if (!url) return baseUrl;
+  
+  // If URL already contains the repo name, use it directly
+  if (url.includes(repoName) && repoName !== '') {
+    return url;
+  }
+  
+  // Otherwise add the base path
+  if (url.startsWith('/')) {
+    return `${basePath}${url.substring(1)}`;
+  }
+  
+  return `${basePath}${url}`;
+}
 ---
 
 <BaseLayout title="ML Blog">
@@ -15,29 +46,48 @@ const posts = await Astro.glob('./*.mdx');
     <h2>Featured Curriculum</h2>
     <div class="featured-card">
       <h3>
-        <a href={navLink('/blog/ml-story/')}>Narrative-Driven ML Curriculum</a>
+        <a href={`${basePath}blog/ml-story/`}>Narrative-Driven ML Curriculum</a>
       </h3>
       <p>A journey through machine learning concepts woven into a continuous story, where each section emerges naturally from the last.</p>
-      <a href={navLink('/blog/ml-story/')} class="read-more">Start learning →</a>
+      <a href={`${basePath}blog/ml-story/`} class="read-more">Start learning →</a>
+    </div>
+    
+    <div class="curriculum-lessons">
+      <h3>Curriculum Lessons</h3>
+      <div class="lesson-grid">
+        {sortedMlStoryPosts.map((post, index) => {
+          return (
+            <div class="lesson-card">
+              <span class="lesson-number">{index + 1}</span>
+              <h4>
+                <a href={fixUrl(post.url)}>{post.frontmatter.title}</a>
+              </h4>
+              <p>{post.frontmatter.description}</p>
+            </div>
+          );
+        })}
+      </div>
     </div>
   </div>
   
   <div class="post-list">
     <h2>Recent Posts</h2>
-    {posts.map(post => (
-      <div class="post-card">
-        <h3>
-          <a href={post.url}>{post.frontmatter.title}</a>
-        </h3>
-        {post.frontmatter.date && <time>{new Date(post.frontmatter.date).toLocaleDateString('en-US', { 
-          year: 'numeric', 
-          month: 'long', 
-          day: 'numeric' 
-        })}</time>}
-        <p>{post.frontmatter.description}</p>
-        <a href={post.url} class="read-more">Read more →</a>
-      </div>
-    ))}
+    {rootPosts.map(post => {
+      return (
+        <div class="post-card">
+          <h3>
+            <a href={fixUrl(post.url)}>{post.frontmatter.title}</a>
+          </h3>
+          {post.frontmatter.date && <time>{new Date(post.frontmatter.date).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}</time>}
+          <p>{post.frontmatter.description}</p>
+          <a href={fixUrl(post.url)} class="read-more">Read more →</a>
+        </div>
+      );
+    })}
   </div>
 </BaseLayout>
 
@@ -49,6 +99,11 @@ const posts = await Astro.glob('./*.mdx');
   h2 {
     margin: 2rem 0 1rem;
     font-size: 1.5rem;
+  }
+  
+  h3 {
+    margin: 1.5rem 0 1rem;
+    font-size: 1.25rem;
   }
   
   .featured-section {
@@ -68,6 +123,67 @@ const posts = await Astro.glob('./*.mdx');
     margin-bottom: 0.5rem;
   }
   
+  .curriculum-lessons {
+    margin-top: 2rem;
+  }
+  
+  .lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .lesson-card {
+    position: relative;
+    padding: 1.25rem;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .lesson-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  .lesson-number {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background-color: #3498db;
+    color: white;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    font-weight: bold;
+  }
+  
+  .lesson-card h4 {
+    margin: 0 0 0.75rem 0;
+    font-size: 1.1rem;
+  }
+  
+  .lesson-card h4 a {
+    color: #2c3e50;
+    text-decoration: none;
+  }
+  
+  .lesson-card h4 a:hover {
+    text-decoration: underline;
+  }
+  
+  .lesson-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #5a6c7d;
+  }
+  
   .featured-card h3 a {
     color: #2c3e50;
     text-decoration: none;
@@ -78,7 +194,7 @@ const posts = await Astro.glob('./*.mdx');
   }
   
   .post-list {
-    margin-top: 2rem;
+    margin-top: 3rem;
   }
   
   .post-card {

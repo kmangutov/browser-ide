@@ -1,7 +1,12 @@
-import { navLink } from '../utils/paths.js';
-
 const { href, class: className, ...props } = Astro.props;
 
-<a href={navLink(href)} class={className} {...props}>
+// Use BASE_PATH from astro.config.mjs, which will be injected at build time
+const baseUrl = import.meta.env.BASE_URL;
+
+// Clean paths to avoid double slashes
+const cleanHref = href.startsWith('/') ? href.substring(1) : href;
+const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+
+<a href={`${cleanBase}/${cleanHref}`} class={className} {...props}>
   <slot />
 </a> 

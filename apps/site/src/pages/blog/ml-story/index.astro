@@ -1,14 +1,15 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { navLink } from '../../../utils/paths.js';
 
 // Get all ML story posts sorted by filename (which contains the sequence number)
 const posts = await Astro.glob('./*.mdx');
-const sortedPosts = posts.sort((a, b) => {
-  const aNum = parseInt(a.url.split('/').pop().split('-')[0]) || 0;
-  const bNum = parseInt(b.url.split('/').pop().split('-')[0]) || 0;
-  return aNum - bNum;
-});
+const sortedPosts = posts
+  .filter(post => !post.url.includes('test-manim'))
+  .sort((a, b) => {
+    const aNum = parseInt(a.url.split('/').pop().split('-')[0]) || 0;
+    const bNum = parseInt(b.url.split('/').pop().split('-')[0]) || 0;
+    return aNum - bNum;
+  });
 
 const title = "Narrative-Driven ML Curriculum";
 const description = "A journey through machine learning concepts woven into a continuous story";
@@ -31,17 +32,13 @@ const description = "A journey through machine learning concepts woven into a co
         <h2 class="text-2xl font-bold">Lessons</h2>
         
         <ul class="ml-6 list-disc space-y-2">
-          {sortedPosts.filter(post => !post.url.includes('test-manim')).map(post => {
-            // Get the URL and ensure it works with the base path
-            const lessonPath = post.url.replace(/^\//, ''); // Remove leading slash if present
-            return (
-              <li>
-                <a href={import.meta.env.BASE_URL + lessonPath} class="text-blue-600 hover:underline">
-                  {post.frontmatter.title}
-                </a>
-              </li>
-            );
-          })}
+          {sortedPosts.map(post => (
+            <li>
+              <a href={post.url} class="text-blue-600 hover:underline">
+                {post.frontmatter.title}
+              </a>
+            </li>
+          ))}
         </ul>
       </div>
 
