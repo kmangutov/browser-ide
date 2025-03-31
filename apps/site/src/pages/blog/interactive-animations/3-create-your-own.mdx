@@ -1,0 +1,133 @@
+---
+layout: ../../../layouts/BlogPostLayout.astro
+title: "Interactive Matplotlib Animations: Create Your Own (Part 3)"
+description: "Learn how to create your own custom animations for machine learning concepts directly in the browser"
+date: 2023-04-12
+series: "interactive-animations" 
+part: 3
+totalParts: 3
+---
+
+import PyodideMatplotlib from '../../../components/PyodideMatplotlib.astro';
+
+# Interactive Matplotlib Animations: Create Your Own (Part 3)
+
+In the [previous parts](1-introduction) of this series, we saw how to create linear regression and decision boundary animations. Now let's look at how to create your own custom animations.
+
+## Creating Your Own Animations
+
+You can create your own animations by following this pattern:
+
+1. Define a class that inherits from `AnimationHelper`
+2. Implement the `setup()` method to initialize your visualization
+3. Implement the `update(frame)` method to handle animation frames
+4. Return `True` to continue the animation or `False` to end it
+5. Set your class instance to the `animation` variable
+
+### Animation Template
+
+<PyodideMatplotlib code={`import numpy as np
+import matplotlib.pyplot as plt
+
+class MyCustomAnimation(AnimationHelper):
+    def setup(self):
+        # Create figure and axis
+        self.fig, self.ax = plt.subplots(figsize=(8, 5))
+        self.ax.set_xlim(0, 10)
+        self.ax.set_ylim(0, 10)
+        self.ax.set_xlabel('X')
+        self.ax.set_ylabel('Y')
+        self.ax.set_title('My Custom Animation')
+        
+        # Initialize data structures
+        self.data = np.random.rand(10)
+        self.line, = self.ax.plot([], [], 'o-', color='blue', linewidth=2)
+        
+        # Animation parameters
+        self.max_frames = 100
+        
+        # Initialize figure
+        plt.tight_layout()
+        update_canvas(self.fig)
+    
+    def update(self, frame):
+        # Calculate progress as percentage of animation completed
+        progress = frame / self.max_frames
+        
+        # Update visualization based on frame
+        x = np.linspace(0, 10, 10)
+        y = 5 + 3 * np.sin(x + progress * 4 * np.pi)
+        
+        # Update line data
+        self.line.set_data(x, y)
+        
+        # End animation when we reach max_frames
+        if frame >= self.max_frames - 1:
+            return False
+            
+        return True
+
+# Create the animation instance
+animation = MyCustomAnimation()
+`} />
+
+## Benefits Over Traditional Manim
+
+While this approach doesn't replace all Manim functionality, it offers several advantages:
+
+1. **Immediate feedback**: Animations run directly in your browser
+2. **No installation**: Everything runs in the browser via WebAssembly
+3. **Interactive editing**: Modify code and instantly see results
+4. **Shareable**: Works on any modern browser without dependencies
+5. **Integration with notebooks**: Can be combined with other browser-based tools
+
+## Limitations
+
+This approach has some limitations compared to full Manim:
+
+1. Less precise control over animation timing and tweening
+2. No 3D support (limited to what Matplotlib can render)
+3. Fewer specialized mathematical animations
+4. Performance depends on the browser and device
+
+## Next Steps
+
+These simple examples demonstrate the concept, but you can create much more sophisticated animations:
+
+1. Neural network activation visualizations
+2. Gradient descent optimization
+3. Decision boundary evolution in SVMs
+4. PCA dimension reduction
+5. Ensemble model voting
+
+Try modifying the examples above or create your own animations to illustrate ML concepts!
+
+<div class="navigation-links">
+  <a href="2-decision-boundaries" class="prev-link">← Previous: Decision Boundaries</a>
+  <div></div>
+</div>
+
+<style>
+  .navigation-links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
+  }
+  
+  .prev-link, .next-link {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #3498db;
+    font-weight: 500;
+  }
+  
+  .prev-link:hover, .next-link:hover {
+    background-color: #e9ecef;
+    text-decoration: underline;
+  }
+</style> 

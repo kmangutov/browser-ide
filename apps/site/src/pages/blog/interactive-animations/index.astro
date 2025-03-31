@@ -1,0 +1,215 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+const baseUrl = import.meta.env.BASE_URL;
+// Ensure baseUrl ends with a slash
+const basePath = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+
+// Get all animation posts and sort them by part number
+const animationPosts = await Astro.glob('./*.mdx');
+const sortedAnimationPosts = animationPosts
+  .sort((a, b) => {
+    return (a.frontmatter.part || 0) - (b.frontmatter.part || 0);
+  });
+
+// Function to ensure URL has correct base path without duplication
+function fixUrl(url) {
+  if (!url) return baseUrl;
+  
+  // Otherwise add the base path
+  if (url.startsWith('/')) {
+    return `${basePath}${url.substring(1)}`;
+  }
+  
+  return `${basePath}${url}`;
+}
+---
+
+<BaseLayout title="Interactive Matplotlib Animations Series">
+  <div class="series-container">
+    <h1>Interactive Matplotlib Animations Series</h1>
+    
+    <p class="intro">
+      This series demonstrates how to create interactive animations using Matplotlib and 
+      Pyodide to run Python code directly in your browser, without any installation.
+    </p>
+    
+    <div class="series-meta">
+      <div>
+        <span class="meta-label">Total parts:</span> 
+        <span class="meta-value">{sortedAnimationPosts.length}</span>
+      </div>
+      <div>
+        <span class="meta-label">Topic:</span> 
+        <span class="meta-value">Matplotlib, Animation, Python in Browser</span>
+      </div>
+    </div>
+    
+    <div class="parts-list">
+      <h2>Series Parts</h2>
+      
+      {sortedAnimationPosts.map((post, index) => (
+        <div class="part-card">
+          <div class="part-number">{post.frontmatter.part}</div>
+          <div class="part-content">
+            <h3>
+              <a href={fixUrl(post.url)}>{post.frontmatter.title}</a>
+            </h3>
+            <p>{post.frontmatter.description}</p>
+            <a href={fixUrl(post.url)} class="read-more">Read part {post.frontmatter.part} →</a>
+          </div>
+        </div>
+      ))}
+    </div>
+    
+    <div class="start-series">
+      <a href="1-introduction" class="start-button">Start from the beginning</a>
+    </div>
+    
+    <div class="back-link">
+      <a href="../">← Back to all blog posts</a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .series-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+  
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+  }
+  
+  .intro {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    color: #34495e;
+  }
+  
+  .series-meta {
+    display: flex;
+    gap: 2rem;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+  }
+  
+  .meta-label {
+    font-weight: bold;
+    color: #7f8c8d;
+  }
+  
+  .meta-value {
+    color: #2c3e50;
+  }
+  
+  .parts-list {
+    margin-bottom: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+  }
+  
+  .part-card {
+    display: flex;
+    margin-bottom: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .part-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  .part-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #3498db;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    min-width: 60px;
+    padding: 1rem;
+  }
+  
+  .part-content {
+    padding: 1rem;
+    flex-grow: 1;
+  }
+  
+  .part-content h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+  }
+  
+  .part-content h3 a {
+    color: #2c3e50;
+    text-decoration: none;
+  }
+  
+  .part-content h3 a:hover {
+    text-decoration: underline;
+  }
+  
+  .read-more {
+    display: inline-block;
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: 0.5rem;
+  }
+  
+  .read-more:hover {
+    text-decoration: underline;
+  }
+  
+  .start-series {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+  }
+  
+  .start-button {
+    display: inline-block;
+    background-color: #3498db;
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.2s;
+  }
+  
+  .start-button:hover {
+    background-color: #2980b9;
+  }
+  
+  .back-link {
+    text-align: center;
+    margin-top: 2rem;
+  }
+  
+  .back-link a {
+    color: #7f8c8d;
+    text-decoration: none;
+  }
+  
+  .back-link a:hover {
+    text-decoration: underline;
+    color: #34495e;
+  }
+</style> 
