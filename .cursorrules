@@ -1,24 +1,28 @@
-# .cursorrules.md
+ # GitHub Pages
+-- Preserve compatibility with GitHub Pages (serve from root or `/docs` folder)
+-- Avoid breaking relative paths in HTML/JS
++- Serve from `/docs` via GitHub Pages
++- Set `base: "/your-repo-name"` in `astro.config.mjs`
++- Use absolute paths in `img`/`script`/`src` that start with `/your-repo-name/...`
++- Avoid relative paths like `./media/foo.gif` or `../js/bar.js` in MDX
 
-## Project Structure
-- Use a monorepo layout: `apps/`, `scripts/`, `packages/`
-- `apps/playground/`: HTML/JS static site with Pyodide + scikit-learn
-- `apps/site/`: Astro-based blog/docs (MDX, narrative, clean aesthetics)
+...
+ # MDX guidelines (in apps/site/src/pages/blog):
+ ...
+-# - Load Pyodide + logic from public JS, not inline script
++# - Load Pyodide logic using:
++#   <script src="/your-repo-name/js/pyodide-loader.js" type="module"></script>
 
-## GitHub Pages
-- Preserve compatibility with GitHub Pages (serve from root or `/docs` folder)
-- Avoid breaking relative paths in HTML/JS
+...
+ # Manim:
+ # - Render .mp4 or .gif using CLI
+-# - Store in static location (e.g., apps/site/public/media)
+-# - Reference from MDX via <img src="/media/your-animation.gif" />
++# - Store in: apps/site/public/media
++# - Reference in MDX using: <img src="/your-repo-name/media/your-animation.gif" />
 
-## Code Style
-- Keep HTML/JS minimal and readable
-- Use semantic HTML and accessible nav elements
-- Organize CSS cleanly; favor utility classes if Astro adds Tailwind later
-
-## JS/Markdown Embeds
-- Support interactive JS snippets (for playground + blog MDX)
-- Prioritize narrative-first, textbook-style presentation
-
-## Iterative Workflow
-- Make small, reversible changes
-- Ensure playground and blog remains functional at every step
-- Add blog/docs features incrementally
+...
+ # Suggested folders:
+ # apps/site/public/js/         → JS for interactivity, Pyodide, sliders, etc
+-# apps/site/public/media/      → Rendered Manim assets
++# apps/site/public/media/      → Rendered Manim assets (use absolute paths)

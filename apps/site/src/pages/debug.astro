@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const baseUrl = import.meta.env.BASE_URL;
+---
+
+<BaseLayout title="URL Debug Information">
+  <h1>URL Debug Information</h1>
+  
+  <div class="debug-info">
+    <h2>Base URL Information</h2>
+    <ul>
+      <li><strong>import.meta.env.BASE_URL:</strong> "{baseUrl}"</li>
+      <li><strong>Site URL:</strong> {import.meta.env.SITE}</li>
+      <li><strong>Current Pathname:</strong> {Astro.url.pathname}</li>
+      <li><strong>Full URL:</strong> {Astro.url.toString()}</li>
+    </ul>
+    
+    <h2>Environment</h2>
+    <ul>
+      <li><strong>MODE:</strong> {import.meta.env.MODE}</li>
+      <li><strong>isProd:</strong> {import.meta.env.PROD ? 'true' : 'false'}</li>
+      <li><strong>isDev:</strong> {import.meta.env.DEV ? 'true' : 'false'}</li>
+    </ul>
+    
+    <h2>Link Tests</h2>
+    <ul>
+      <li><a href="/">Root link (/)</a></li>
+      <li><a href="/blog/">Blog link (/blog/)</a></li>
+      <li><a href={baseUrl}>Base URL link ({baseUrl})</a></li>
+      <li><a href={`${baseUrl}blog/`}>Base URL + blog link ({`${baseUrl}blog/`})</a></li>
+      <li><a href="/browser-ide/blog/">Hardcoded repo link (/browser-ide/blog/)</a></li>
+    </ul>
+  </div>
+</BaseLayout>
+
+<style>
+  h1 {
+    margin-bottom: 1.5rem;
+  }
+  
+  h2 {
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.5rem;
+  }
+  
+  .debug-info {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    font-family: monospace;
+  }
+  
+  ul {
+    padding-left: 1.5rem;
+  }
+  
+  li {
+    margin-bottom: 0.5rem;
+  }
+  
+  a {
+    color: #3498db;
+  }
+</style> 

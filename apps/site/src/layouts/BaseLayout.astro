@@ -3,6 +3,25 @@ const { title, description } = Astro.props;
 const baseUrl = import.meta.env.BASE_URL;
 // Ensure baseUrl ends with a slash
 const basePath = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+// Get repository name without slashes for checking
+const repoName = baseUrl.replace(/\//g, '');
+
+// Function to ensure URL has correct base path without duplication
+function fixUrl(url) {
+  if (!url) return baseUrl;
+  
+  // If URL already contains the repo name, use it directly
+  if (url.includes(repoName) && repoName !== '') {
+    return url;
+  }
+  
+  // Otherwise add the base path
+  if (url.startsWith('/')) {
+    return `${basePath}${url.substring(1)}`;
+  }
+  
+  return `${basePath}${url}`;
+}
 ---
 
 <!DOCTYPE html>
@@ -81,7 +100,7 @@ const basePath = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
   <nav class="main-nav">
     <ul>
       <li><a href={baseUrl} class={Astro.url.pathname === baseUrl || Astro.url.pathname === "/" ? "active" : ""}>Playground</a></li>
-      <li><a href={`${basePath}blog/`} class={Astro.url.pathname.startsWith(`${baseUrl}blog`) || Astro.url.pathname.startsWith("/blog") ? "active" : ""}>Blog</a></li>
+      <li><a href={fixUrl('blog/')} class={Astro.url.pathname.startsWith(`${baseUrl}blog`) || Astro.url.pathname.startsWith("/blog") ? "active" : ""}>Blog</a></li>
     </ul>
   </nav>
   

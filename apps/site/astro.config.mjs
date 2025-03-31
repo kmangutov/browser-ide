@@ -7,7 +7,7 @@ const REPO_NAME = 'browser-ide'; // ← replace with your actual repo name
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://your-github-username.github.io',
+  site: 'https://kmangutov.github.io',
   base: `/${REPO_NAME}`,
   outDir: '../../docs',
   integrations: [
