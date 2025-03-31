@@ -1,11 +1,12 @@
 ---
 const { code } = Astro.props;
+const baseUrl = import.meta.env.BASE_URL;
+// Ensure baseUrl ends with a slash
+const basePath = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
 ---
 
 <div class="pyodide-embed">
-  <div class="code-editor">
-    <pre class="code-display">{code}</pre>
-  </div>
+  <div class="code-editor" id="codeEditor"></div>
   <div class="controls">
     <button id="runButton">Run Code</button>
   </div>
@@ -13,6 +14,10 @@ const { code } = Astro.props;
     <div id="output" class="output"></div>
   </div>
 </div>
+
+<!-- CodeMirror CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
 
 <style>
   .pyodide-embed {
@@ -23,18 +28,28 @@ const { code } = Astro.props;
   }
   
   .code-editor {
-    padding: 1rem;
+    /* Remove padding so CodeMirror handles it */
     background-color: #282c34;
-    overflow: auto;
-    max-height: 400px;
   }
   
-  .code-display {
-    margin: 0;
+  /* CodeMirror specific styles */
+  :global(.CodeMirror) {
+    height: auto;
+    max-height: 400px;
+    border: none;
     font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
     font-size: 14px;
     line-height: 1.5;
-    color: #abb2bf;
+  }
+  
+  /* Fix for line numbers */
+  :global(.CodeMirror-gutter) {
+    background-color: #21252b;
+    border-right: 1px solid #181a1f;
+  }
+  
+  :global(.CodeMirror-linenumber) {
+    color: #636d83;
   }
   
   .controls {
@@ -95,16 +110,69 @@ const { code } = Astro.props;
   }
 </style>
 
+<script src={`${basePath}js/pyodide-loader.js`} type="module"></script>
+
 <script>
-  // Global variable to assign pyodide to
+  // First, load all necessary CodeMirror scripts
+  const loadScripts = async () => {
+    // Load scripts in sequence to ensure proper dependency order
+    const scriptUrls = [
+      "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js",
+      "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js",
+      "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/matchbrackets.min.js",
+      "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"
+    ];
+    
+    for (const url of scriptUrls) {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = url;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+  };
+  
+  // Initialize the CodeMirror editor
+  const initCodeEditor = (code) => {
+    const editor = CodeMirror(document.getElementById('codeEditor'), {
+      value: code,
+      mode: 'python',
+      theme: 'monokai',
+      lineNumbers: true,
+      indentUnit: 4,
+      lineWrapping: true,
+      matchBrackets: true,
+      autoCloseBrackets: true,
+      viewportMargin: Infinity,
+      gutters: ["CodeMirror-linenumbers"],
+      readOnly: false,
+      lineNumberFormatter: function(line) {
+        return line;
+      },
+      extraKeys: {
+        "Tab": function(cm) {
+          cm.replaceSelection("    ", "end");
+        }
+      }
+    });
+    
+    // Refresh to ensure proper rendering
+    setTimeout(() => {
+      editor.refresh();
+    }, 100);
+    
+    return editor;
+  };
+  
+  // Initialize Pyodide
   let pyodideReadyPromise;
   
-  // Load Pyodide and its packages just once per page
   function initializePyodide() {
     if (!pyodideReadyPromise) {
       pyodideReadyPromise = (async function() {
-        // Add the Pyodide script to the page
-        // Only do this once even if there are multiple embeds
+        // Add the Pyodide script
         if (!window.loadPyodide) {
           const script = document.createElement('script');
           script.src = "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js";
@@ -116,7 +184,7 @@ const { code } = Astro.props;
         const pyodide = await window.loadPyodide();
         console.log("Pyodide loaded successfully!");
         
-        // Load required packages - EXACT same order as playground
+        // Load required packages
         console.log("Loading scikit-learn, numpy, and pandas...");
         await pyodide.loadPackage(["scikit-learn", "numpy", "pandas"]);
         console.log("ML packages loaded successfully!");
@@ -126,37 +194,35 @@ const { code } = Astro.props;
     }
     return pyodideReadyPromise;
   }
-
-  document.addEventListener('DOMContentLoaded', () => {
+  
+  document.addEventListener('DOMContentLoaded', async () => {
     const containers = document.querySelectorAll('.pyodide-embed');
     
-    // Initialize each PyodideEmbed container
-    containers.forEach((container, index) => {
+    // Make sure all scripts are properly loaded
+    await loadScripts();
+    
+    // Now the global CodeMirror object should be available
+    containers.forEach((container) => {
+      // Use dataset to get the code value from the server component
+      const initialCode = '{code}';
+      const editor = initCodeEditor(initialCode);
+      
       const runButton = container.querySelector('#runButton');
       const output = container.querySelector('#output');
-      const codeElement = container.querySelector('.code-display');
       
-      // Start loading Pyodide immediately
-      // But don't block the page
+      // Start loading Pyodide
       let pyodidePromise = initializePyodide();
-      
-      // Show initial message
       output.innerText = "Python environment loading...";
       
       // Set up the run button
       runButton.addEventListener('click', async () => {
-        // Start by disabling the button during execution
         runButton.disabled = true;
         output.innerText = "Running...";
         
         try {
-          // Ensure Pyodide is loaded
           const pyodide = await pyodidePromise;
+          const userCode = editor.getValue();
           
-          // Get the code
-          const userCode = codeElement.textContent;
-          
-          // Set up capturing stdout/stderr
           let capturedOutput = "";
           pyodide.setStdout({
             write: (text) => {
@@ -172,16 +238,12 @@ const { code } = Astro.props;
             }
           });
           
-          // Execute the code directly without a wrapper
           capturedOutput = "";
           const result = await pyodide.runPythonAsync(userCode);
           
-          // Check if result contains an error property (from Python try/except)
           if (result && typeof result === 'object' && 'error' in result) {
             output.innerHTML = `<span class="error">Error: ${result.error}</span>`;
-            console.error("Python error:", result.error);
           } 
-          // Format and display the result if it exists and output is empty
           else if (result !== undefined && result !== null && capturedOutput === "") {
             if (typeof result === 'object') {
               output.innerText = JSON.stringify(result, null, 2);
@@ -189,26 +251,22 @@ const { code } = Astro.props;
               output.innerText = String(result);
             }
           }
-          // If we already have output from stdout/stderr, leave it as is
           
         } catch (error) {
           output.innerHTML = `<span class="error">Error: ${error.message || String(error)}</span>`;
           console.error("Python execution error:", error);
         } finally {
-          // Re-enable the button
           runButton.disabled = false;
         }
       });
       
-      // Check if Pyodide is already loaded when visible
+      // Check if Pyodide is loaded when visible
       const observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting) {
-          // When the component becomes visible, check if Pyodide is loaded
           pyodidePromise.then(() => {
             output.innerText = "Python environment ready. Click 'Run Code' to execute.";
           }).catch(error => {
             output.innerText = `Error loading Python: ${error.message}`;
-            console.error("Failed to load Pyodide:", error);
           });
           observer.disconnect();
         }

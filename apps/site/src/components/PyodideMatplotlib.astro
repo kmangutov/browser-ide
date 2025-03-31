@@ -2,12 +2,13 @@
 const { code } = Astro.props;
 // Generate a unique ID for this component instance
 const uniqueId = `pyodide_${Math.random().toString(36).substr(2, 9)}`;
+const baseUrl = import.meta.env.BASE_URL;
+// Ensure baseUrl ends with a slash
+const basePath = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
 ---
 
-<div class="pyodide-embed" data-component-id={uniqueId}>
-  <div class="code-editor">
-    <pre class="code-display">{code}</pre>
-  </div>
+<div class="pyodide-embed" data-component-id={uniqueId} data-code={code}>
+  <div class="code-editor" id={`codeEditor_${uniqueId}`}></div>
   <div class="controls">
     <button class="run-button">Run Animation</button>
     <button class="pause-button" disabled>Pause</button>
@@ -21,6 +22,10 @@ const uniqueId = `pyodide_${Math.random().toString(36).substr(2, 9)}`;
   </div>
 </div>
 
+<!-- CodeMirror CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">
+
 <style>
   .pyodide-embed {
     margin: 2rem 0;
@@ -30,18 +35,27 @@ const uniqueId = `pyodide_${Math.random().toString(36).substr(2, 9)}`;
   }
   
   .code-editor {
-    padding: 1rem;
     background-color: #282c34;
-    overflow: auto;
-    max-height: 400px;
   }
   
-  .code-display {
-    margin: 0;
+  /* CodeMirror specific styles */
+  :global(.CodeMirror) {
+    height: auto;
+    max-height: 400px;
+    border: none;
     font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
     font-size: 14px;
     line-height: 1.5;
-    color: #abb2bf;
+  }
+  
+  /* Fix for line numbers */
+  :global(.CodeMirror-gutter) {
+    background-color: #21252b;
+    border-right: 1px solid #181a1f;
+  }
+  
+  :global(.CodeMirror-linenumber) {
+    color: #636d83;
   }
   
   .controls {
@@ -109,13 +123,68 @@ const uniqueId = `pyodide_${Math.random().toString(36).substr(2, 9)}`;
   }
 </style>
 
-<script is:inline>
-  // Use a self-executing function to ensure proper scoping
+<script src={`${basePath}js/pyodide-loader.js`} type="module"></script>
+<script>
   (function() {
+    // Load all necessary CodeMirror scripts
+    const loadScripts = async () => {
+      const scriptUrls = [
+        "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/matchbrackets.min.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"
+      ];
+      
+      for (const url of scriptUrls) {
+        await new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = url;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      }
+    };
+
+    // Initialize the CodeMirror editor
+    const initCodeMirror = (container, uniqueId) => {
+      const editorElement = document.getElementById(`codeEditor_${uniqueId}`);
+      const initialCode = container.dataset.code;
+      
+      const editor = CodeMirror(editorElement, {
+        value: initialCode,
+        mode: 'python',
+        theme: 'monokai',
+        lineNumbers: true,
+        indentUnit: 4,
+        lineWrapping: true,
+        matchBrackets: true,
+        autoCloseBrackets: true,
+        viewportMargin: Infinity,
+        gutters: ["CodeMirror-linenumbers"],
+        readOnly: false,
+        lineNumberFormatter: function(line) {
+          return line;
+        },
+        extraKeys: {
+          "Tab": function(cm) {
+            cm.replaceSelection("    ", "end");
+          }
+        }
+      });
+      
+      // Refresh to ensure proper rendering
+      setTimeout(() => {
+        editor.refresh();
+      }, 100);
+      
+      return editor;
+    };
+    
     // Global variable to assign pyodide to
     let pyodideReadyPromise;
     
-    // Load Pyodide and its packages just once per page
+    // Load Pyodide
     function initializePyodide() {
       if (!pyodideReadyPromise) {
         pyodideReadyPromise = (async function() {
@@ -163,32 +232,34 @@ const uniqueId = `pyodide_${Math.random().toString(36).substr(2, 9)}`;
     }
 
     // Initialize components when ready
-    function initializeComponents() {
-      const containers = document.querySelectorAll('.pyodide-embed');
+    async function initializeComponents() {
+      // Wait for scripts to load first
+      await loadScripts();
       
       // Initialize each PyodideEmbed container
+      const containers = document.querySelectorAll('.pyodide-embed');
+      
       containers.forEach((container) => {
-        // Store the animation state for this specific container
+        const componentId = container.dataset.componentId;
+        // Initialize CodeMirror for this container
+        const editor = initCodeMirror(container, componentId);
+        
+        // Store the animation state for this container
         const instanceState = {
           animationFrameId: null,
-          animationPaused: false
+          animationPaused: false,
+          editor: editor
         };
         
-        // Get the unique ID for this container
-        const componentId = container.dataset.componentId;
-        
-        // Get the elements for this specific container
+        // Get the elements for this container
         const runButton = container.querySelector('.run-button');
         const pauseButton = container.querySelector('.pause-button');
         const resetButton = container.querySelector('.reset-button');
         const output = container.querySelector('.output-text');
-        const codeElement = container.querySelector('.code-display');
         const canvas = container.querySelector('.output-canvas');
         
-        // Start loading Pyodide immediately
+        // Start loading Pyodide
         let pyodidePromise = initializePyodide();
-        
-        // Show initial message
         output.innerText = "Python environment loading...";
         
         // Setup animation controls
@@ -239,8 +310,8 @@ const uniqueId = `pyodide_${Math.random().toString(36).substr(2, 9)}`;
             // Ensure Pyodide is loaded
             const pyodide = await pyodidePromise;
             
-            // Get the code
-            const userCode = codeElement.textContent;
+            // Get the code from CodeMirror
+            const userCode = instanceState.editor.getValue();
             
             // Set up capturing stdout/stderr
             let capturedOutput = "";
@@ -335,7 +406,6 @@ const uniqueId = `pyodide_${Math.random().toString(36).substr(2, 9)}`;
                   const result = pyodideGlobal(frame);
                   
                   // Check if animation should continue
-                  // Handle both Pyodide proxy objects and direct JS values
                   const shouldContinue = typeof result.toJs === 'function' ? result.toJs() : result;
                   
                   if (!shouldContinue) {
@@ -374,7 +444,6 @@ const uniqueId = `pyodide_${Math.random().toString(36).substr(2, 9)}`;
         // Check if Pyodide is already loaded when visible
         const observer = new IntersectionObserver((entries) => {
           if (entries[0].isIntersecting) {
-            // When the component becomes visible, check if Pyodide is loaded
             pyodidePromise.then(() => {
               output.innerText = "Python environment ready. Click 'Run Animation' to execute.";
             }).catch(error => {
