@@ -1,7 +1,7 @@
 import { _ as __astro_tag_component__, f as createVNode, F as Fragment } from './astro/server-BpiS1_cD.js';
 import '@astrojs/internal-helpers/path';
 import { $ as $$Image } from './_astro_assets-DNMPS4SJ.js';
-import { $ as $$PyodideEmbed } from './PyodideEmbed-Dey0xsfI.js';
+import { $ as $$PyodideEmbed } from './PyodideEmbed-hEc-L5vS.js';
 import 'html-escaper';
 import 'clsx';
 

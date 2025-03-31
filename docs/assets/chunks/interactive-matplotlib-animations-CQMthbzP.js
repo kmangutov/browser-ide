@@ -1,7 +1,7 @@
 import { _ as __astro_tag_component__, f as createVNode, F as Fragment } from './astro/server-BpiS1_cD.js';
 import '@astrojs/internal-helpers/path';
 import { $ as $$Image } from './_astro_assets-DNMPS4SJ.js';
-import { $ as $$PyodideMatplotlib } from './PyodideMatplotlib-BQsgqGZh.js';
+import { $ as $$PyodideMatplotlib } from './PyodideMatplotlib-difLZ4Ex.js';
 import 'html-escaper';
 import 'clsx';
 

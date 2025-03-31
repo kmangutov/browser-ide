@@ -1,6 +1,6 @@
-<!DOCTYPE html><html lang="en" data-astro-cid-37fxchfa> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Learn how to run Python machine learning code directly in your browser using Pyodide and scikit-learn without any server or installation."><title>Running scikit-learn in the browser</title><link rel="stylesheet" href="/browser-ide/assets/narrative-ml-curriculum-DFFnzQgT.css">
+<!DOCTYPE html><html lang="en" data-astro-cid-37fxchfa> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Learn how to run Python machine learning code directly in your browser using Pyodide and scikit-learn without any server or installation."><title>Running scikit-learn in the browser</title><link rel="stylesheet" href="/browser-ide/assets/narrative-ml-curriculum-Cb5t0VV7.css">
 <link rel="stylesheet" href="/browser-ide/assets/creating-pyodide-animations-D13ptpoQ.css">
-<link rel="stylesheet" href="/browser-ide/assets/creating-pyodide-animations-3o92PDWl.css"><script type="module" src="/browser-ide/assets/hoisted-Baf8ZKyT.js"></script></head> <body data-astro-cid-37fxchfa> <!-- Navigation Bar --> <nav class="main-nav" data-astro-cid-37fxchfa> <ul data-astro-cid-37fxchfa> <li data-astro-cid-37fxchfa><a href="/browser-ide" class="" data-astro-cid-37fxchfa>Playground</a></li> <li data-astro-cid-37fxchfa><a href="/browser-ide/blog/" class="" data-astro-cid-37fxchfa>Blog</a></li> </ul> </nav> <main class="content" data-astro-cid-37fxchfa>  <article data-astro-cid-2q5oecfc> <header data-astro-cid-2q5oecfc> <h1 data-astro-cid-2q5oecfc>Running scikit-learn in the browser</h1> <time data-astro-cid-2q5oecfc>April 9, 2023</time> </header> <div class="prose" data-astro-cid-2q5oecfc> <h1 id="running-scikit-learn-in-the-browser">Running scikit-learn in the browser</h1>
+<link rel="stylesheet" href="/browser-ide/assets/creating-pyodide-animations-3o92PDWl.css"><script type="module" src="/browser-ide/assets/hoisted-BMXuhmr_.js"></script></head> <body data-astro-cid-37fxchfa> <!-- Navigation Bar --> <nav class="main-nav" data-astro-cid-37fxchfa> <ul data-astro-cid-37fxchfa> <li data-astro-cid-37fxchfa><a href="/browser-ide" class="" data-astro-cid-37fxchfa>Playground</a></li> <li data-astro-cid-37fxchfa><a href="/browser-ide/blog/" class="" data-astro-cid-37fxchfa>Blog</a></li> </ul> </nav> <main class="content" data-astro-cid-37fxchfa>  <article data-astro-cid-2q5oecfc> <header data-astro-cid-2q5oecfc> <h1 data-astro-cid-2q5oecfc>Running scikit-learn in the browser</h1> <time data-astro-cid-2q5oecfc>April 9, 2023</time> </header> <div class="prose" data-astro-cid-2q5oecfc> <h1 id="running-scikit-learn-in-the-browser">Running scikit-learn in the browser</h1>
 <p>Machine learning typically requires a Python environment with libraries like scikit-learn installed. But what if you could run this code directly in your browser? That’s exactly what <a href="https://pyodide.org/">Pyodide</a> enables by bringing Python to WebAssembly.</p>
 <h2 id="how-it-works">How it works</h2>
 <p>Pyodide is a Python interpreter compiled to WebAssembly, allowing Python to run directly in the browser. When combined with scientific libraries like NumPy, pandas, and scikit-learn, it enables running machine learning algorithms without a server.</p>
@@ -13,55 +13,7 @@
 </ul>
 <h2 id="example-linear-regression-with-scikit-learn">Example: Linear Regression with scikit-learn</h2>
 <p>Below is a simple example using scikit-learn to perform linear regression on synthetic data:</p>
-<div class="pyodide-embed" data-astro-cid-udmswuc5> <div class="code-editor" data-astro-cid-udmswuc5> <pre class="code-display" data-astro-cid-udmswuc5># Import necessary libraries
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
-import numpy as np
-
-try:
-  # Generate synthetic data
-  np.random.seed(42)
-  X = np.random.rand(100, 4) * 10  # 100 samples, 4 features
-  y = 2 + 3 * X[:, 0] + 1.5 * X[:, 1] - 0.5 * X[:, 2] + 0.2 * X[:, 3] + np.random.randn(100) * 2
-
-  # Split the data into training and testing sets
-  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-  # Create and train the model
-  model = LinearRegression()
-  model.fit(X_train, y_train)
-
-  # Make predictions
-  y_pred = model.predict(X_test)
-
-  # Calculate metrics
-  mse = mean_squared_error(y_test, y_pred)
-  r2 = r2_score(y_test, y_pred)
-
-  # Print results
-  print(f&quot;Model: Linear Regression&quot;)
-  print(f&quot;Mean Squared Error: {mse:.4f}&quot;)
-  print(f&quot;R² Score: {r2:.4f}&quot;)
-  print(f&quot;Coefficients: {model.coef_}&quot;)
-  print(f&quot;Intercept: {model.intercept_}&quot;)
-
-  # Create a results dictionary to return - convert all NumPy arrays to lists
-  result = {
-      &quot;model_type&quot;: &quot;LinearRegression&quot;,
-      &quot;mse&quot;: float(mse),
-      &quot;r2&quot;: float(r2),
-      &quot;coefficients&quot;: model.coef_.tolist(),
-      &quot;intercept&quot;: float(model.intercept_),
-      &quot;y_test&quot;: y_test.tolist(),
-      &quot;y_pred&quot;: y_pred.tolist()
-  }
-
-  # This dictionary will be converted to JSON-friendly format automatically
-  result
-except Exception as e:
-  # Return error information if something goes wrong
-  {&quot;error&quot;: str(e)}</pre> </div> <div class="controls" data-astro-cid-udmswuc5> <button id="runButton" data-astro-cid-udmswuc5>Run Code</button> </div> <div class="output-container" data-astro-cid-udmswuc5> <div id="output" class="output" data-astro-cid-udmswuc5></div> </div> </div>  
+<div class="pyodide-embed" data-astro-cid-udmswuc5> <div class="code-editor" id="codeEditor" data-astro-cid-udmswuc5></div> <div class="controls" data-astro-cid-udmswuc5> <button id="runButton" data-astro-cid-udmswuc5>Run Code</button> </div> <div class="output-container" data-astro-cid-udmswuc5> <div id="output" class="output" data-astro-cid-udmswuc5></div> </div> </div> <!-- CodeMirror CSS --> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">  <script src="/browser-ide/js/pyodide-loader.js" type="module"></script> 
 <h2 id="how-the-code-works">How the code works</h2>
 <p>This example demonstrates several key concepts:</p>
 <ol>

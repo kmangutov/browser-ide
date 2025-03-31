@@ -1,6 +1,6 @@
-<!DOCTYPE html><html lang="en" data-astro-cid-37fxchfa> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Create and run interactive animations for machine learning concepts directly in your browser"><title>Interactive Matplotlib Animations: A Manim-Inspired Approach</title><link rel="stylesheet" href="/browser-ide/assets/creating-pyodide-animations-COUoZuBW.css">
+<!DOCTYPE html><html lang="en" data-astro-cid-37fxchfa> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="description" content="Create and run interactive animations for machine learning concepts directly in your browser"><title>Interactive Matplotlib Animations: A Manim-Inspired Approach</title><link rel="stylesheet" href="/browser-ide/assets/creating-pyodide-animations-Bx0WdnMN.css">
 <link rel="stylesheet" href="/browser-ide/assets/creating-pyodide-animations-D13ptpoQ.css">
-<link rel="stylesheet" href="/browser-ide/assets/creating-pyodide-animations-3o92PDWl.css"></head> <body data-astro-cid-37fxchfa> <!-- Navigation Bar --> <nav class="main-nav" data-astro-cid-37fxchfa> <ul data-astro-cid-37fxchfa> <li data-astro-cid-37fxchfa><a href="/browser-ide" class="" data-astro-cid-37fxchfa>Playground</a></li> <li data-astro-cid-37fxchfa><a href="/browser-ide/blog/" class="" data-astro-cid-37fxchfa>Blog</a></li> </ul> </nav> <main class="content" data-astro-cid-37fxchfa>  <article data-astro-cid-2q5oecfc> <header data-astro-cid-2q5oecfc> <h1 data-astro-cid-2q5oecfc>Interactive Matplotlib Animations: A Manim-Inspired Approach</h1> <time data-astro-cid-2q5oecfc>April 11, 2023</time> </header> <div class="prose" data-astro-cid-2q5oecfc> <h1 id="interactive-matplotlib-animations-a-manim-inspired-approach">Interactive Matplotlib Animations: A Manim-Inspired Approach</h1>
+<link rel="stylesheet" href="/browser-ide/assets/creating-pyodide-animations-3o92PDWl.css"><script type="module" src="/browser-ide/assets/hoisted-DdpqYZoe.js"></script></head> <body data-astro-cid-37fxchfa> <!-- Navigation Bar --> <nav class="main-nav" data-astro-cid-37fxchfa> <ul data-astro-cid-37fxchfa> <li data-astro-cid-37fxchfa><a href="/browser-ide" class="" data-astro-cid-37fxchfa>Playground</a></li> <li data-astro-cid-37fxchfa><a href="/browser-ide/blog/" class="" data-astro-cid-37fxchfa>Blog</a></li> </ul> </nav> <main class="content" data-astro-cid-37fxchfa>  <article data-astro-cid-2q5oecfc> <header data-astro-cid-2q5oecfc> <h1 data-astro-cid-2q5oecfc>Interactive Matplotlib Animations: A Manim-Inspired Approach</h1> <time data-astro-cid-2q5oecfc>April 11, 2023</time> </header> <div class="prose" data-astro-cid-2q5oecfc> <h1 id="interactive-matplotlib-animations-a-manim-inspired-approach">Interactive Matplotlib Animations: A Manim-Inspired Approach</h1>
 <p>While <a href="https://www.manim.community/">Manim</a> is a powerful animation engine used to create precise mathematical animations, it requires Python installation with numerous dependencies. But what if you could create similar animations directly in your browser?</p>
 <p>This page demonstrates how to use Python’s Matplotlib in WebAssembly (via Pyodide) to create animated visualizations similar to basic Manim animations, without any installation.</p>
 <h2 id="how-it-works">How it works</h2>
@@ -12,7 +12,7 @@
 </ol>
 <h2 id="example-1-linear-regression-animation">Example 1: Linear Regression Animation</h2>
 <p>This animation shows data points appearing on a plane, followed by a regression line that fits them. The framework is structured to separate initialization, animation, and cleanup phases:</p>
-<div class="pyodide-embed" data-component-id="pyodide_lijcyy46e" data-astro-cid-afk6wh7r> <div class="code-editor" data-astro-cid-afk6wh7r> <pre class="code-display" data-astro-cid-afk6wh7r>import numpy as np
+<div class="pyodide-embed" data-component-id="pyodide_ej6aj9uoo" data-code="import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
@@ -23,9 +23,9 @@ class LinearRegressionAnimation(AnimationHelper):
       self.fig, self.ax = plt.subplots(figsize=(8, 5))
       self.ax.set_xlim(0, 10)
       self.ax.set_ylim(0, 10)
-      self.ax.set_xlabel(&#39;X&#39;)
-      self.ax.set_ylabel(&#39;Y&#39;)
-      self.ax.set_title(&#39;Linear Regression Animation&#39;)
+      self.ax.set_xlabel('X')
+      self.ax.set_ylabel('Y')
+      self.ax.set_title('Linear Regression Animation')
       
       # Generate data points with noise
       np.random.seed(42)
@@ -49,16 +49,16 @@ class LinearRegressionAnimation(AnimationHelper):
   
   def update(self, frame):
       # Phase 1: Add points one by one
-      if frame &lt; self.points_phase_end:
+      if frame < self.points_phase_end:
           point_idx = min(int(frame * len(self.x) / self.points_phase_end), len(self.x) - 1)
           
           # Only add a new point if needed
-          if len(self.points) &lt;= point_idx:
-              point, = self.ax.plot(self.x[point_idx], self.y[point_idx], &#39;o&#39;, color=&#39;blue&#39;, markersize=8)
+          if len(self.points) <= point_idx:
+              point, = self.ax.plot(self.x[point_idx], self.y[point_idx], 'o', color='blue', markersize=8)
               self.points.append(point)
       
       # Phase 2: Draw regression line
-      elif frame &lt; self.line_phase_end:
+      elif frame < self.line_phase_end:
           progress = (frame - self.points_phase_end) / (self.line_phase_end - self.points_phase_end)
           
           # Calculate linear regression coefficients
@@ -66,20 +66,20 @@ class LinearRegressionAnimation(AnimationHelper):
           
           # Create or update the line
           x_line = np.array([0, 10])
-          y_line = b + m * x_line * progress  # Animate line&#39;s slope
+          y_line = b + m * x_line * progress  # Animate line's slope
           
           if self.line is None:
-              self.line, = self.ax.plot(x_line, y_line, &#39;-&#39;, color=&#39;red&#39;, linewidth=2)
+              self.line, = self.ax.plot(x_line, y_line, '-', color='red', linewidth=2)
           else:
               self.line.set_ydata(y_line)
               
           # Add a label with the equation
           if frame == self.line_phase_end - 1:
-              self.ax.text(1, 9, f&#39;y = {b:.2f} + {m:.2f}x&#39;, fontsize=12, 
-                           bbox=dict(facecolor=&#39;white&#39;, alpha=0.7))
+              self.ax.text(1, 9, f'y = {b:.2f} + {m:.2f}x', fontsize=12, 
+                           bbox=dict(facecolor='white', alpha=0.7))
               
       # Phase 3: Show errors
-      elif frame &lt; self.error_phase_end:
+      elif frame < self.error_phase_end:
           # Only draw error lines once at the start of this phase
           if not self.error_lines:
               m, b = np.polyfit(self.x, self.y, 1)
@@ -87,315 +87,25 @@ class LinearRegressionAnimation(AnimationHelper):
               for i in range(len(self.x)):
                   pred_y = b + m * self.x[i]
                   line = self.ax.plot([self.x[i], self.x[i]], [self.y[i], pred_y], 
-                                      &#39;--&#39;, color=&#39;green&#39;, alpha=0.7)[0]
+                                      '--', color='green', alpha=0.7)[0]
                   self.error_lines.append(line)
               
-              self.ax.text(6, 2, &#39;Errors&#39;, color=&#39;green&#39;, fontsize=12,
-                           bbox=dict(facecolor=&#39;white&#39;, alpha=0.7))
+              self.ax.text(6, 2, 'Errors', color='green', fontsize=12,
+                           bbox=dict(facecolor='white', alpha=0.7))
       
       # Final phase: Complete animation
       else:
-          if frame &gt;= self.max_frames - 1:
+          if frame >= self.max_frames - 1:
               return False  # End animation
       
       return True  # Continue animation
 
 # Create the animation instance
 animation = LinearRegressionAnimation()
-</pre> </div> <div class="controls" data-astro-cid-afk6wh7r> <button class="run-button" data-astro-cid-afk6wh7r>Run Animation</button> <button class="pause-button" disabled data-astro-cid-afk6wh7r>Pause</button> <button class="reset-button" disabled data-astro-cid-afk6wh7r>Reset</button> </div> <div class="visualization-container" data-astro-cid-afk6wh7r> <img class="output-canvas" id="outputCanvas_pyodide_lijcyy46e" width="800" height="500" data-astro-cid-afk6wh7r> </div> <div class="output-container" data-astro-cid-afk6wh7r> <div class="output-text" data-astro-cid-afk6wh7r></div> </div> </div>  <script>
-  // Use a self-executing function to ensure proper scoping
-  (function() {
-    // Global variable to assign pyodide to
-    let pyodideReadyPromise;
-    
-    // Load Pyodide and its packages just once per page
-    function initializePyodide() {
-      if (!pyodideReadyPromise) {
-        pyodideReadyPromise = (async function() {
-          // Add the Pyodide script to the page
-          if (!window.loadPyodide) {
-            const script = document.createElement('script');
-            script.src = "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js";
-            document.head.appendChild(script);
-            await new Promise(resolve => script.onload = resolve);
-          }
-          
-          console.log("Loading Pyodide...");
-          const pyodide = await window.loadPyodide();
-          console.log("Pyodide loaded successfully!");
-          
-          // Load required packages
-          console.log("Loading matplotlib and numpy...");
-          await pyodide.loadPackage(["matplotlib", "numpy"]);
-          console.log("Packages loaded successfully!");
-          
-          // Configure matplotlib to use agg backend
-          await pyodide.runPythonAsync(`
-            import matplotlib
-            matplotlib.use('agg')
-            
-            # Set up functions for rendering to base64
-            import matplotlib.pyplot as plt
-            import io
-            import base64
-            
-            def render_to_base64(fig=None):
-                if fig is None:
-                    fig = plt.gcf()
-                buf = io.BytesIO()
-                fig.savefig(buf, format='png', dpi=100, bbox_inches='tight')
-                buf.seek(0)
-                img_str = base64.b64encode(buf.getvalue()).decode('utf-8')
-                return f"data:image/png;base64,{img_str}"
-          `);
-          
-          return pyodide;
-        })();
-      }
-      return pyodideReadyPromise;
-    }
-
-    // Initialize components when ready
-    function initializeComponents() {
-      const containers = document.querySelectorAll('.pyodide-embed');
-      
-      // Initialize each PyodideEmbed container
-      containers.forEach((container) => {
-        // Store the animation state for this specific container
-        const instanceState = {
-          animationFrameId: null,
-          animationPaused: false
-        };
-        
-        // Get the unique ID for this container
-        const componentId = container.dataset.componentId;
-        
-        // Get the elements for this specific container
-        const runButton = container.querySelector('.run-button');
-        const pauseButton = container.querySelector('.pause-button');
-        const resetButton = container.querySelector('.reset-button');
-        const output = container.querySelector('.output-text');
-        const codeElement = container.querySelector('.code-display');
-        const canvas = container.querySelector('.output-canvas');
-        
-        // Start loading Pyodide immediately
-        let pyodidePromise = initializePyodide();
-        
-        // Show initial message
-        output.innerText = "Python environment loading...";
-        
-        // Setup animation controls
-        pauseButton.addEventListener('click', () => {
-          if (instanceState.animationPaused) {
-            pauseButton.textContent = 'Pause';
-            instanceState.animationPaused = false;
-          } else {
-            pauseButton.textContent = 'Resume';
-            instanceState.animationPaused = true;
-          }
-        });
-        
-        resetButton.addEventListener('click', async () => {
-          // Cancel any existing animation
-          if (instanceState.animationFrameId) {
-            cancelAnimationFrame(instanceState.animationFrameId);
-            instanceState.animationFrameId = null;
-          }
-          
-          // Clear the canvas
-          canvas.src = '';
-          
-          // Reset animation state
-          instanceState.animationPaused = false;
-          pauseButton.textContent = 'Pause';
-          
-          // Disable animation controls
-          pauseButton.disabled = true;
-          resetButton.disabled = true;
-          
-          // Re-enable run button
-          runButton.disabled = false;
-          
-          output.innerText = "Animation reset. Click 'Run Animation' to start again.";
-        });
-        
-        // Set up the run button
-        runButton.addEventListener('click', async () => {
-          // Start by disabling the run button and enabling animation controls
-          runButton.disabled = true;
-          pauseButton.disabled = false;
-          resetButton.disabled = false;
-          
-          output.innerText = "Running...";
-          
-          try {
-            // Ensure Pyodide is loaded
-            const pyodide = await pyodidePromise;
-            
-            // Get the code
-            const userCode = codeElement.textContent;
-            
-            // Set up capturing stdout/stderr
-            let capturedOutput = "";
-            pyodide.setStdout({
-              write: (text) => {
-                capturedOutput += text;
-                output.innerText = capturedOutput;
-              }
-            });
-            
-            pyodide.setStderr({
-              write: (text) => {
-                capturedOutput += `\nError: ${text}`;
-                output.innerText = capturedOutput;
-              }
-            });
-            
-            // Add canvas binding helper with the specific canvas ID for this instance
-            await pyodide.runPythonAsync(`
-              import matplotlib.pyplot as plt
-              from js import document
-              
-              # Get the output image element for this specific instance
-              canvas = document.getElementById('outputCanvas_${componentId}')
-              
-              # Helper function to update the canvas with matplotlib figure
-              def update_canvas(fig=None):
-                  if fig is None:
-                      fig = plt.gcf()
-                  # Render figure to base64 PNG and update image src
-                  img_data = render_to_base64(fig)
-                  canvas.src = img_data
-                  
-              # Create animation helpers
-              class AnimationHelper:
-                  def __init__(self):
-                      self.frame = 0
-                      self.max_frames = 100
-                      self.is_initialized = False
-                      self.is_running = False
-                      
-                  def setup(self):
-                      # Override in user code
-                      pass
-                      
-                  def update(self, frame):
-                      # Override in user code
-                      pass
-                      
-                  def cleanup(self):
-                      # Override in user code
-                      pass
-              
-              # Default animation helper
-              animation = AnimationHelper()
-            `);
-            
-            // Execute the user code
-            capturedOutput = "";
-            await pyodide.runPythonAsync(userCode);
-            
-            // Start the animation loop
-            await pyodide.runPythonAsync(`
-              # Initialize the animation
-              if hasattr(animation, 'setup'):
-                  animation.setup()
-                  animation.is_initialized = True
-              
-              # Update function will be called from JS
-              def animation_step(frame):
-                  if hasattr(animation, 'update'):
-                      try:
-                          animation.update(frame)
-                          update_canvas()
-                          return True
-                      except Exception as e:
-                          print(f"Error in animation frame {frame}: {e}")
-                          return False
-                  return False
-              
-              animation.is_running = True
-            `);
-            
-            // Set up JS animation loop
-            let frame = 0;
-            const pyodideGlobal = pyodide.globals.get('animation_step');
-            
-            function animationLoop() {
-              if (!instanceState.animationPaused) {
-                try {
-                  // Call the Python animation step function
-                  const result = pyodideGlobal(frame);
-                  
-                  // Check if animation should continue
-                  // Handle both Pyodide proxy objects and direct JS values
-                  const shouldContinue = typeof result.toJs === 'function' ? result.toJs() : result;
-                  
-                  if (!shouldContinue) {
-                    // Animation is complete or errored
-                    cancelAnimationFrame(instanceState.animationFrameId);
-                    instanceState.animationFrameId = null;
-                    output.innerText += "\nAnimation complete.";
-                    return;
-                  }
-                  frame++;
-                } catch (error) {
-                  output.innerHTML += `\n<span class="error">Error in animation: ${error.message}</span>`;
-                  cancelAnimationFrame(instanceState.animationFrameId);
-                  instanceState.animationFrameId = null;
-                  return;
-                }
-              }
-              instanceState.animationFrameId = requestAnimationFrame(animationLoop);
-            }
-            
-            // Start the animation
-            instanceState.animationFrameId = requestAnimationFrame(animationLoop);
-            output.innerText = "Animation running...";
-            
-          } catch (error) {
-            output.innerHTML = `<span class="error">Error: ${error.message || String(error)}</span>`;
-            console.error("Python execution error:", error);
-            
-            // Re-enable the run button and disable animation controls
-            runButton.disabled = false;
-            pauseButton.disabled = true;
-            resetButton.disabled = true;
-          }
-        });
-        
-        // Check if Pyodide is already loaded when visible
-        const observer = new IntersectionObserver((entries) => {
-          if (entries[0].isIntersecting) {
-            // When the component becomes visible, check if Pyodide is loaded
-            pyodidePromise.then(() => {
-              output.innerText = "Python environment ready. Click 'Run Animation' to execute.";
-            }).catch(error => {
-              output.innerText = `Error loading Python: ${error.message}`;
-              console.error("Failed to load Pyodide:", error);
-            });
-            observer.disconnect();
-          }
-        });
-        
-        observer.observe(container);
-      });
-    }
-
-    // Initialize when DOM is loaded
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initializeComponents);
-    } else {
-      initializeComponents();
-    }
-    
-    // Also initialize when window fully loads (backup)
-    window.addEventListener("load", initializeComponents);
-  })();
-</script>
+" data-astro-cid-afk6wh7r> <div class="code-editor" id="codeEditor_pyodide_ej6aj9uoo" data-astro-cid-afk6wh7r></div> <div class="controls" data-astro-cid-afk6wh7r> <button class="run-button" data-astro-cid-afk6wh7r>Run Animation</button> <button class="pause-button" disabled data-astro-cid-afk6wh7r>Pause</button> <button class="reset-button" disabled data-astro-cid-afk6wh7r>Reset</button> </div> <div class="visualization-container" data-astro-cid-afk6wh7r> <img class="output-canvas" id="outputCanvas_pyodide_ej6aj9uoo" width="800" height="500" data-astro-cid-afk6wh7r> </div> <div class="output-container" data-astro-cid-afk6wh7r> <div class="output-text" data-astro-cid-afk6wh7r></div> </div> </div> <!-- CodeMirror CSS --> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">  <script src="/browser-ide/js/pyodide-loader.js" type="module"></script> 
 <h2 id="example-2-decision-boundaries-animation">Example 2: Decision Boundaries Animation</h2>
 <p>This animation shows a decision tree splitting a feature space to classify points, illustrating how decision boundaries are formed:</p>
-<div class="pyodide-embed" data-component-id="pyodide_5trs0l9l0" data-astro-cid-afk6wh7r> <div class="code-editor" data-astro-cid-afk6wh7r> <pre class="code-display" data-astro-cid-afk6wh7r>import numpy as np
+<div class="pyodide-embed" data-component-id="pyodide_tfxrq7f2g" data-code="import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection
@@ -406,9 +116,9 @@ class DecisionTreeAnimation(AnimationHelper):
       self.fig, self.ax = plt.subplots(figsize=(8, 5))
       self.ax.set_xlim(0, 10)
       self.ax.set_ylim(0, 10)
-      self.ax.set_xlabel(&#39;Feature 1&#39;)
-      self.ax.set_ylabel(&#39;Feature 2&#39;)
-      self.ax.set_title(&#39;Decision Tree Boundary Animation&#39;)
+      self.ax.set_xlabel('Feature 1')
+      self.ax.set_ylabel('Feature 2')
+      self.ax.set_title('Decision Tree Boundary Animation')
       
       # Generate random data points for two classes
       np.random.seed(42)
@@ -439,56 +149,56 @@ class DecisionTreeAnimation(AnimationHelper):
   
   def update(self, frame):
       # Phase 1: Draw points
-      if frame &lt; self.points_phase_end:
+      if frame < self.points_phase_end:
           # Calculate how many points to show
           n_class1 = min(int(frame * len(self.class1_x) / self.points_phase_end), len(self.class1_x))
           n_class2 = min(int(frame * len(self.class2_x) / self.points_phase_end), len(self.class2_x))
           
           # Only add new points if needed
-          while len(self.class1_points) &lt; n_class1:
+          while len(self.class1_points) < n_class1:
               idx = len(self.class1_points)
-              point, = self.ax.plot(self.class1_x[idx], self.class1_y[idx], &#39;o&#39;, color=&#39;blue&#39;, markersize=8)
+              point, = self.ax.plot(self.class1_x[idx], self.class1_y[idx], 'o', color='blue', markersize=8)
               self.class1_points.append(point)
               
-          while len(self.class2_points) &lt; n_class2:
+          while len(self.class2_points) < n_class2:
               idx = len(self.class2_points)
-              point, = self.ax.plot(self.class2_x[idx], self.class2_y[idx], &#39;o&#39;, color=&#39;red&#39;, markersize=8)
+              point, = self.ax.plot(self.class2_x[idx], self.class2_y[idx], 'o', color='red', markersize=8)
               self.class2_points.append(point)
               
           if frame == self.points_phase_end - 1:
-              self.ax.text(7, 7, &#39;Class 1&#39;, color=&#39;blue&#39;, fontsize=12,
-                           bbox=dict(facecolor=&#39;white&#39;, alpha=0.7))
-              self.ax.text(3, 3, &#39;Class 2&#39;, color=&#39;red&#39;, fontsize=12,
-                           bbox=dict(facecolor=&#39;white&#39;, alpha=0.7))
+              self.ax.text(7, 7, 'Class 1', color='blue', fontsize=12,
+                           bbox=dict(facecolor='white', alpha=0.7))
+              self.ax.text(3, 3, 'Class 2', color='red', fontsize=12,
+                           bbox=dict(facecolor='white', alpha=0.7))
       
       # Phase 2: First split (vertical line)
-      elif frame &lt; self.first_split_phase_end:
+      elif frame < self.first_split_phase_end:
           # Draw the first decision boundary (x = 4.5)
           if not self.split_lines:
-              line = self.ax.axvline(x=4.5, color=&#39;black&#39;, linestyle=&#39;--&#39;, linewidth=2)
+              line = self.ax.axvline(x=4.5, color='black', linestyle='--', linewidth=2)
               self.split_lines.append(line)
               
               # Text annotation
-              self.ax.text(4.7, 9, &#39;First Split: x &lt; 4.5&#39;, fontsize=10,
-                           bbox=dict(facecolor=&#39;white&#39;, alpha=0.7))
+              self.ax.text(4.7, 9, 'First Split: x < 4.5', fontsize=10,
+                           bbox=dict(facecolor='white', alpha=0.7))
               
               # Add semi-transparent regions
-              rect1 = Rectangle((0, 0), 4.5, 10, alpha=0.2, color=&#39;red&#39;)
-              rect2 = Rectangle((4.5, 0), 5.5, 10, alpha=0.2, color=&#39;blue&#39;)
+              rect1 = Rectangle((0, 0), 4.5, 10, alpha=0.2, color='red')
+              rect2 = Rectangle((4.5, 0), 5.5, 10, alpha=0.2, color='blue')
               self.ax.add_patch(rect1)
               self.ax.add_patch(rect2)
               self.regions.extend([rect1, rect2])
       
       # Phase 3: Second split (horizontal line in left region)
-      elif frame &lt; self.second_split_phase_end:
-          # Draw the second decision boundary (y = 5 but only for x &lt; 4.5)
+      elif frame < self.second_split_phase_end:
+          # Draw the second decision boundary (y = 5 but only for x < 4.5)
           if len(self.split_lines) == 1:
-              line = self.ax.plot([0, 4.5], [5, 5], &#39;--&#39;, color=&#39;black&#39;, linewidth=2)[0]
+              line = self.ax.plot([0, 4.5], [5, 5], '--', color='black', linewidth=2)[0]
               self.split_lines.append(line)
               
               # Text annotation
-              self.ax.text(1, 5.2, &#39;Second Split: y &lt; 5&#39;, fontsize=10,
-                           bbox=dict(facecolor=&#39;white&#39;, alpha=0.7))
+              self.ax.text(1, 5.2, 'Second Split: y < 5', fontsize=10,
+                           bbox=dict(facecolor='white', alpha=0.7))
               
               # Update regions
               for patch in self.regions:
@@ -496,9 +206,9 @@ class DecisionTreeAnimation(AnimationHelper):
               self.regions = []
               
               # Create new regions with decision boundaries
-              rect1 = Rectangle((0, 0), 4.5, 5, alpha=0.2, color=&#39;red&#39;)
-              rect2 = Rectangle((0, 5), 4.5, 5, alpha=0.2, color=&#39;green&#39;)
-              rect3 = Rectangle((4.5, 0), 5.5, 10, alpha=0.2, color=&#39;blue&#39;)
+              rect1 = Rectangle((0, 0), 4.5, 5, alpha=0.2, color='red')
+              rect2 = Rectangle((0, 5), 4.5, 5, alpha=0.2, color='green')
+              rect3 = Rectangle((4.5, 0), 5.5, 10, alpha=0.2, color='blue')
               
               self.ax.add_patch(rect1)
               self.ax.add_patch(rect2)
@@ -509,311 +219,21 @@ class DecisionTreeAnimation(AnimationHelper):
       else:
           if frame == self.second_split_phase_end:
               # Final text with accuracy
-              self.ax.text(1, 1, &#39;Class 2: 87% purity&#39;, color=&#39;white&#39;, fontsize=10,
-                          bbox=dict(facecolor=&#39;red&#39;, alpha=0.7))
-              self.ax.text(1, 8, &#39;Mixed region&#39;, color=&#39;black&#39;, fontsize=10,
-                          bbox=dict(facecolor=&#39;green&#39;, alpha=0.7))
-              self.ax.text(8, 5, &#39;Class 1: 93% purity&#39;, color=&#39;white&#39;, fontsize=10,
-                          bbox=dict(facecolor=&#39;blue&#39;, alpha=0.7))
+              self.ax.text(1, 1, 'Class 2: 87% purity', color='white', fontsize=10,
+                          bbox=dict(facecolor='red', alpha=0.7))
+              self.ax.text(1, 8, 'Mixed region', color='black', fontsize=10,
+                          bbox=dict(facecolor='green', alpha=0.7))
+              self.ax.text(8, 5, 'Class 1: 93% purity', color='white', fontsize=10,
+                          bbox=dict(facecolor='blue', alpha=0.7))
           
-          if frame &gt;= self.max_frames - 1:
+          if frame >= self.max_frames - 1:
               return False  # End animation
       
       return True  # Continue animation
 
 # Create the animation instance
 animation = DecisionTreeAnimation()
-</pre> </div> <div class="controls" data-astro-cid-afk6wh7r> <button class="run-button" data-astro-cid-afk6wh7r>Run Animation</button> <button class="pause-button" disabled data-astro-cid-afk6wh7r>Pause</button> <button class="reset-button" disabled data-astro-cid-afk6wh7r>Reset</button> </div> <div class="visualization-container" data-astro-cid-afk6wh7r> <img class="output-canvas" id="outputCanvas_pyodide_5trs0l9l0" width="800" height="500" data-astro-cid-afk6wh7r> </div> <div class="output-container" data-astro-cid-afk6wh7r> <div class="output-text" data-astro-cid-afk6wh7r></div> </div> </div>  <script>
-  // Use a self-executing function to ensure proper scoping
-  (function() {
-    // Global variable to assign pyodide to
-    let pyodideReadyPromise;
-    
-    // Load Pyodide and its packages just once per page
-    function initializePyodide() {
-      if (!pyodideReadyPromise) {
-        pyodideReadyPromise = (async function() {
-          // Add the Pyodide script to the page
-          if (!window.loadPyodide) {
-            const script = document.createElement('script');
-            script.src = "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js";
-            document.head.appendChild(script);
-            await new Promise(resolve => script.onload = resolve);
-          }
-          
-          console.log("Loading Pyodide...");
-          const pyodide = await window.loadPyodide();
-          console.log("Pyodide loaded successfully!");
-          
-          // Load required packages
-          console.log("Loading matplotlib and numpy...");
-          await pyodide.loadPackage(["matplotlib", "numpy"]);
-          console.log("Packages loaded successfully!");
-          
-          // Configure matplotlib to use agg backend
-          await pyodide.runPythonAsync(`
-            import matplotlib
-            matplotlib.use('agg')
-            
-            # Set up functions for rendering to base64
-            import matplotlib.pyplot as plt
-            import io
-            import base64
-            
-            def render_to_base64(fig=None):
-                if fig is None:
-                    fig = plt.gcf()
-                buf = io.BytesIO()
-                fig.savefig(buf, format='png', dpi=100, bbox_inches='tight')
-                buf.seek(0)
-                img_str = base64.b64encode(buf.getvalue()).decode('utf-8')
-                return f"data:image/png;base64,{img_str}"
-          `);
-          
-          return pyodide;
-        })();
-      }
-      return pyodideReadyPromise;
-    }
-
-    // Initialize components when ready
-    function initializeComponents() {
-      const containers = document.querySelectorAll('.pyodide-embed');
-      
-      // Initialize each PyodideEmbed container
-      containers.forEach((container) => {
-        // Store the animation state for this specific container
-        const instanceState = {
-          animationFrameId: null,
-          animationPaused: false
-        };
-        
-        // Get the unique ID for this container
-        const componentId = container.dataset.componentId;
-        
-        // Get the elements for this specific container
-        const runButton = container.querySelector('.run-button');
-        const pauseButton = container.querySelector('.pause-button');
-        const resetButton = container.querySelector('.reset-button');
-        const output = container.querySelector('.output-text');
-        const codeElement = container.querySelector('.code-display');
-        const canvas = container.querySelector('.output-canvas');
-        
-        // Start loading Pyodide immediately
-        let pyodidePromise = initializePyodide();
-        
-        // Show initial message
-        output.innerText = "Python environment loading...";
-        
-        // Setup animation controls
-        pauseButton.addEventListener('click', () => {
-          if (instanceState.animationPaused) {
-            pauseButton.textContent = 'Pause';
-            instanceState.animationPaused = false;
-          } else {
-            pauseButton.textContent = 'Resume';
-            instanceState.animationPaused = true;
-          }
-        });
-        
-        resetButton.addEventListener('click', async () => {
-          // Cancel any existing animation
-          if (instanceState.animationFrameId) {
-            cancelAnimationFrame(instanceState.animationFrameId);
-            instanceState.animationFrameId = null;
-          }
-          
-          // Clear the canvas
-          canvas.src = '';
-          
-          // Reset animation state
-          instanceState.animationPaused = false;
-          pauseButton.textContent = 'Pause';
-          
-          // Disable animation controls
-          pauseButton.disabled = true;
-          resetButton.disabled = true;
-          
-          // Re-enable run button
-          runButton.disabled = false;
-          
-          output.innerText = "Animation reset. Click 'Run Animation' to start again.";
-        });
-        
-        // Set up the run button
-        runButton.addEventListener('click', async () => {
-          // Start by disabling the run button and enabling animation controls
-          runButton.disabled = true;
-          pauseButton.disabled = false;
-          resetButton.disabled = false;
-          
-          output.innerText = "Running...";
-          
-          try {
-            // Ensure Pyodide is loaded
-            const pyodide = await pyodidePromise;
-            
-            // Get the code
-            const userCode = codeElement.textContent;
-            
-            // Set up capturing stdout/stderr
-            let capturedOutput = "";
-            pyodide.setStdout({
-              write: (text) => {
-                capturedOutput += text;
-                output.innerText = capturedOutput;
-              }
-            });
-            
-            pyodide.setStderr({
-              write: (text) => {
-                capturedOutput += `\nError: ${text}`;
-                output.innerText = capturedOutput;
-              }
-            });
-            
-            // Add canvas binding helper with the specific canvas ID for this instance
-            await pyodide.runPythonAsync(`
-              import matplotlib.pyplot as plt
-              from js import document
-              
-              # Get the output image element for this specific instance
-              canvas = document.getElementById('outputCanvas_${componentId}')
-              
-              # Helper function to update the canvas with matplotlib figure
-              def update_canvas(fig=None):
-                  if fig is None:
-                      fig = plt.gcf()
-                  # Render figure to base64 PNG and update image src
-                  img_data = render_to_base64(fig)
-                  canvas.src = img_data
-                  
-              # Create animation helpers
-              class AnimationHelper:
-                  def __init__(self):
-                      self.frame = 0
-                      self.max_frames = 100
-                      self.is_initialized = False
-                      self.is_running = False
-                      
-                  def setup(self):
-                      # Override in user code
-                      pass
-                      
-                  def update(self, frame):
-                      # Override in user code
-                      pass
-                      
-                  def cleanup(self):
-                      # Override in user code
-                      pass
-              
-              # Default animation helper
-              animation = AnimationHelper()
-            `);
-            
-            // Execute the user code
-            capturedOutput = "";
-            await pyodide.runPythonAsync(userCode);
-            
-            // Start the animation loop
-            await pyodide.runPythonAsync(`
-              # Initialize the animation
-              if hasattr(animation, 'setup'):
-                  animation.setup()
-                  animation.is_initialized = True
-              
-              # Update function will be called from JS
-              def animation_step(frame):
-                  if hasattr(animation, 'update'):
-                      try:
-                          animation.update(frame)
-                          update_canvas()
-                          return True
-                      except Exception as e:
-                          print(f"Error in animation frame {frame}: {e}")
-                          return False
-                  return False
-              
-              animation.is_running = True
-            `);
-            
-            // Set up JS animation loop
-            let frame = 0;
-            const pyodideGlobal = pyodide.globals.get('animation_step');
-            
-            function animationLoop() {
-              if (!instanceState.animationPaused) {
-                try {
-                  // Call the Python animation step function
-                  const result = pyodideGlobal(frame);
-                  
-                  // Check if animation should continue
-                  // Handle both Pyodide proxy objects and direct JS values
-                  const shouldContinue = typeof result.toJs === 'function' ? result.toJs() : result;
-                  
-                  if (!shouldContinue) {
-                    // Animation is complete or errored
-                    cancelAnimationFrame(instanceState.animationFrameId);
-                    instanceState.animationFrameId = null;
-                    output.innerText += "\nAnimation complete.";
-                    return;
-                  }
-                  frame++;
-                } catch (error) {
-                  output.innerHTML += `\n<span class="error">Error in animation: ${error.message}</span>`;
-                  cancelAnimationFrame(instanceState.animationFrameId);
-                  instanceState.animationFrameId = null;
-                  return;
-                }
-              }
-              instanceState.animationFrameId = requestAnimationFrame(animationLoop);
-            }
-            
-            // Start the animation
-            instanceState.animationFrameId = requestAnimationFrame(animationLoop);
-            output.innerText = "Animation running...";
-            
-          } catch (error) {
-            output.innerHTML = `<span class="error">Error: ${error.message || String(error)}</span>`;
-            console.error("Python execution error:", error);
-            
-            // Re-enable the run button and disable animation controls
-            runButton.disabled = false;
-            pauseButton.disabled = true;
-            resetButton.disabled = true;
-          }
-        });
-        
-        // Check if Pyodide is already loaded when visible
-        const observer = new IntersectionObserver((entries) => {
-          if (entries[0].isIntersecting) {
-            // When the component becomes visible, check if Pyodide is loaded
-            pyodidePromise.then(() => {
-              output.innerText = "Python environment ready. Click 'Run Animation' to execute.";
-            }).catch(error => {
-              output.innerText = `Error loading Python: ${error.message}`;
-              console.error("Failed to load Pyodide:", error);
-            });
-            observer.disconnect();
-          }
-        });
-        
-        observer.observe(container);
-      });
-    }
-
-    // Initialize when DOM is loaded
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initializeComponents);
-    } else {
-      initializeComponents();
-    }
-    
-    // Also initialize when window fully loads (backup)
-    window.addEventListener("load", initializeComponents);
-  })();
-</script>
+" data-astro-cid-afk6wh7r> <div class="code-editor" id="codeEditor_pyodide_tfxrq7f2g" data-astro-cid-afk6wh7r></div> <div class="controls" data-astro-cid-afk6wh7r> <button class="run-button" data-astro-cid-afk6wh7r>Run Animation</button> <button class="pause-button" disabled data-astro-cid-afk6wh7r>Pause</button> <button class="reset-button" disabled data-astro-cid-afk6wh7r>Reset</button> </div> <div class="visualization-container" data-astro-cid-afk6wh7r> <img class="output-canvas" id="outputCanvas_pyodide_tfxrq7f2g" width="800" height="500" data-astro-cid-afk6wh7r> </div> <div class="output-container" data-astro-cid-afk6wh7r> <div class="output-text" data-astro-cid-afk6wh7r></div> </div> </div> <!-- CodeMirror CSS --> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">  <script src="/browser-ide/js/pyodide-loader.js" type="module"></script> 
 <h2 id="creating-your-own-animations">Creating Your Own Animations</h2>
 <p>You can create your own animations by following this pattern:</p>
 <ol>
@@ -824,7 +244,7 @@ animation = DecisionTreeAnimation()
 <li>Set your class instance to the <code>animation</code> variable</li>
 </ol>
 <h3 id="animation-template">Animation Template</h3>
-<div class="pyodide-embed" data-component-id="pyodide_8n80fl2y6" data-astro-cid-afk6wh7r> <div class="code-editor" data-astro-cid-afk6wh7r> <pre class="code-display" data-astro-cid-afk6wh7r>import numpy as np
+<div class="pyodide-embed" data-component-id="pyodide_ntea3st41" data-code="import numpy as np
 import matplotlib.pyplot as plt
 
 class MyCustomAnimation(AnimationHelper):
@@ -833,13 +253,13 @@ class MyCustomAnimation(AnimationHelper):
       self.fig, self.ax = plt.subplots(figsize=(8, 5))
       self.ax.set_xlim(0, 10)
       self.ax.set_ylim(0, 10)
-      self.ax.set_xlabel(&#39;X&#39;)
-      self.ax.set_ylabel(&#39;Y&#39;)
-      self.ax.set_title(&#39;My Custom Animation&#39;)
+      self.ax.set_xlabel('X')
+      self.ax.set_ylabel('Y')
+      self.ax.set_title('My Custom Animation')
       
       # Initialize data structures
       self.data = np.random.rand(10)
-      self.line, = self.ax.plot([], [], &#39;o-&#39;, color=&#39;blue&#39;, linewidth=2)
+      self.line, = self.ax.plot([], [], 'o-', color='blue', linewidth=2)
       
       # Animation parameters
       self.max_frames = 100
@@ -860,304 +280,14 @@ class MyCustomAnimation(AnimationHelper):
       self.line.set_data(x, y)
       
       # End animation when we reach max_frames
-      if frame &gt;= self.max_frames - 1:
+      if frame >= self.max_frames - 1:
           return False
           
       return True
 
 # Create the animation instance
 animation = MyCustomAnimation()
-</pre> </div> <div class="controls" data-astro-cid-afk6wh7r> <button class="run-button" data-astro-cid-afk6wh7r>Run Animation</button> <button class="pause-button" disabled data-astro-cid-afk6wh7r>Pause</button> <button class="reset-button" disabled data-astro-cid-afk6wh7r>Reset</button> </div> <div class="visualization-container" data-astro-cid-afk6wh7r> <img class="output-canvas" id="outputCanvas_pyodide_8n80fl2y6" width="800" height="500" data-astro-cid-afk6wh7r> </div> <div class="output-container" data-astro-cid-afk6wh7r> <div class="output-text" data-astro-cid-afk6wh7r></div> </div> </div>  <script>
-  // Use a self-executing function to ensure proper scoping
-  (function() {
-    // Global variable to assign pyodide to
-    let pyodideReadyPromise;
-    
-    // Load Pyodide and its packages just once per page
-    function initializePyodide() {
-      if (!pyodideReadyPromise) {
-        pyodideReadyPromise = (async function() {
-          // Add the Pyodide script to the page
-          if (!window.loadPyodide) {
-            const script = document.createElement('script');
-            script.src = "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js";
-            document.head.appendChild(script);
-            await new Promise(resolve => script.onload = resolve);
-          }
-          
-          console.log("Loading Pyodide...");
-          const pyodide = await window.loadPyodide();
-          console.log("Pyodide loaded successfully!");
-          
-          // Load required packages
-          console.log("Loading matplotlib and numpy...");
-          await pyodide.loadPackage(["matplotlib", "numpy"]);
-          console.log("Packages loaded successfully!");
-          
-          // Configure matplotlib to use agg backend
-          await pyodide.runPythonAsync(`
-            import matplotlib
-            matplotlib.use('agg')
-            
-            # Set up functions for rendering to base64
-            import matplotlib.pyplot as plt
-            import io
-            import base64
-            
-            def render_to_base64(fig=None):
-                if fig is None:
-                    fig = plt.gcf()
-                buf = io.BytesIO()
-                fig.savefig(buf, format='png', dpi=100, bbox_inches='tight')
-                buf.seek(0)
-                img_str = base64.b64encode(buf.getvalue()).decode('utf-8')
-                return f"data:image/png;base64,{img_str}"
-          `);
-          
-          return pyodide;
-        })();
-      }
-      return pyodideReadyPromise;
-    }
-
-    // Initialize components when ready
-    function initializeComponents() {
-      const containers = document.querySelectorAll('.pyodide-embed');
-      
-      // Initialize each PyodideEmbed container
-      containers.forEach((container) => {
-        // Store the animation state for this specific container
-        const instanceState = {
-          animationFrameId: null,
-          animationPaused: false
-        };
-        
-        // Get the unique ID for this container
-        const componentId = container.dataset.componentId;
-        
-        // Get the elements for this specific container
-        const runButton = container.querySelector('.run-button');
-        const pauseButton = container.querySelector('.pause-button');
-        const resetButton = container.querySelector('.reset-button');
-        const output = container.querySelector('.output-text');
-        const codeElement = container.querySelector('.code-display');
-        const canvas = container.querySelector('.output-canvas');
-        
-        // Start loading Pyodide immediately
-        let pyodidePromise = initializePyodide();
-        
-        // Show initial message
-        output.innerText = "Python environment loading...";
-        
-        // Setup animation controls
-        pauseButton.addEventListener('click', () => {
-          if (instanceState.animationPaused) {
-            pauseButton.textContent = 'Pause';
-            instanceState.animationPaused = false;
-          } else {
-            pauseButton.textContent = 'Resume';
-            instanceState.animationPaused = true;
-          }
-        });
-        
-        resetButton.addEventListener('click', async () => {
-          // Cancel any existing animation
-          if (instanceState.animationFrameId) {
-            cancelAnimationFrame(instanceState.animationFrameId);
-            instanceState.animationFrameId = null;
-          }
-          
-          // Clear the canvas
-          canvas.src = '';
-          
-          // Reset animation state
-          instanceState.animationPaused = false;
-          pauseButton.textContent = 'Pause';
-          
-          // Disable animation controls
-          pauseButton.disabled = true;
-          resetButton.disabled = true;
-          
-          // Re-enable run button
-          runButton.disabled = false;
-          
-          output.innerText = "Animation reset. Click 'Run Animation' to start again.";
-        });
-        
-        // Set up the run button
-        runButton.addEventListener('click', async () => {
-          // Start by disabling the run button and enabling animation controls
-          runButton.disabled = true;
-          pauseButton.disabled = false;
-          resetButton.disabled = false;
-          
-          output.innerText = "Running...";
-          
-          try {
-            // Ensure Pyodide is loaded
-            const pyodide = await pyodidePromise;
-            
-            // Get the code
-            const userCode = codeElement.textContent;
-            
-            // Set up capturing stdout/stderr
-            let capturedOutput = "";
-            pyodide.setStdout({
-              write: (text) => {
-                capturedOutput += text;
-                output.innerText = capturedOutput;
-              }
-            });
-            
-            pyodide.setStderr({
-              write: (text) => {
-                capturedOutput += `\nError: ${text}`;
-                output.innerText = capturedOutput;
-              }
-            });
-            
-            // Add canvas binding helper with the specific canvas ID for this instance
-            await pyodide.runPythonAsync(`
-              import matplotlib.pyplot as plt
-              from js import document
-              
-              # Get the output image element for this specific instance
-              canvas = document.getElementById('outputCanvas_${componentId}')
-              
-              # Helper function to update the canvas with matplotlib figure
-              def update_canvas(fig=None):
-                  if fig is None:
-                      fig = plt.gcf()
-                  # Render figure to base64 PNG and update image src
-                  img_data = render_to_base64(fig)
-                  canvas.src = img_data
-                  
-              # Create animation helpers
-              class AnimationHelper:
-                  def __init__(self):
-                      self.frame = 0
-                      self.max_frames = 100
-                      self.is_initialized = False
-                      self.is_running = False
-                      
-                  def setup(self):
-                      # Override in user code
-                      pass
-                      
-                  def update(self, frame):
-                      # Override in user code
-                      pass
-                      
-                  def cleanup(self):
-                      # Override in user code
-                      pass
-              
-              # Default animation helper
-              animation = AnimationHelper()
-            `);
-            
-            // Execute the user code
-            capturedOutput = "";
-            await pyodide.runPythonAsync(userCode);
-            
-            // Start the animation loop
-            await pyodide.runPythonAsync(`
-              # Initialize the animation
-              if hasattr(animation, 'setup'):
-                  animation.setup()
-                  animation.is_initialized = True
-              
-              # Update function will be called from JS
-              def animation_step(frame):
-                  if hasattr(animation, 'update'):
-                      try:
-                          animation.update(frame)
-                          update_canvas()
-                          return True
-                      except Exception as e:
-                          print(f"Error in animation frame {frame}: {e}")
-                          return False
-                  return False
-              
-              animation.is_running = True
-            `);
-            
-            // Set up JS animation loop
-            let frame = 0;
-            const pyodideGlobal = pyodide.globals.get('animation_step');
-            
-            function animationLoop() {
-              if (!instanceState.animationPaused) {
-                try {
-                  // Call the Python animation step function
-                  const result = pyodideGlobal(frame);
-                  
-                  // Check if animation should continue
-                  // Handle both Pyodide proxy objects and direct JS values
-                  const shouldContinue = typeof result.toJs === 'function' ? result.toJs() : result;
-                  
-                  if (!shouldContinue) {
-                    // Animation is complete or errored
-                    cancelAnimationFrame(instanceState.animationFrameId);
-                    instanceState.animationFrameId = null;
-                    output.innerText += "\nAnimation complete.";
-                    return;
-                  }
-                  frame++;
-                } catch (error) {
-                  output.innerHTML += `\n<span class="error">Error in animation: ${error.message}</span>`;
-                  cancelAnimationFrame(instanceState.animationFrameId);
-                  instanceState.animationFrameId = null;
-                  return;
-                }
-              }
-              instanceState.animationFrameId = requestAnimationFrame(animationLoop);
-            }
-            
-            // Start the animation
-            instanceState.animationFrameId = requestAnimationFrame(animationLoop);
-            output.innerText = "Animation running...";
-            
-          } catch (error) {
-            output.innerHTML = `<span class="error">Error: ${error.message || String(error)}</span>`;
-            console.error("Python execution error:", error);
-            
-            // Re-enable the run button and disable animation controls
-            runButton.disabled = false;
-            pauseButton.disabled = true;
-            resetButton.disabled = true;
-          }
-        });
-        
-        // Check if Pyodide is already loaded when visible
-        const observer = new IntersectionObserver((entries) => {
-          if (entries[0].isIntersecting) {
-            // When the component becomes visible, check if Pyodide is loaded
-            pyodidePromise.then(() => {
-              output.innerText = "Python environment ready. Click 'Run Animation' to execute.";
-            }).catch(error => {
-              output.innerText = `Error loading Python: ${error.message}`;
-              console.error("Failed to load Pyodide:", error);
-            });
-            observer.disconnect();
-          }
-        });
-        
-        observer.observe(container);
-      });
-    }
-
-    // Initialize when DOM is loaded
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initializeComponents);
-    } else {
-      initializeComponents();
-    }
-    
-    // Also initialize when window fully loads (backup)
-    window.addEventListener("load", initializeComponents);
-  })();
-</script>
+" data-astro-cid-afk6wh7r> <div class="code-editor" id="codeEditor_pyodide_ntea3st41" data-astro-cid-afk6wh7r></div> <div class="controls" data-astro-cid-afk6wh7r> <button class="run-button" data-astro-cid-afk6wh7r>Run Animation</button> <button class="pause-button" disabled data-astro-cid-afk6wh7r>Pause</button> <button class="reset-button" disabled data-astro-cid-afk6wh7r>Reset</button> </div> <div class="visualization-container" data-astro-cid-afk6wh7r> <img class="output-canvas" id="outputCanvas_pyodide_ntea3st41" width="800" height="500" data-astro-cid-afk6wh7r> </div> <div class="output-container" data-astro-cid-afk6wh7r> <div class="output-text" data-astro-cid-afk6wh7r></div> </div> </div> <!-- CodeMirror CSS --> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/monokai.min.css">  <script src="/browser-ide/js/pyodide-loader.js" type="module"></script> 
 <h2 id="benefits-over-traditional-manim">Benefits Over Traditional Manim</h2>
 <p>While this approach doesn’t replace all Manim functionality, it offers several advantages:</p>
 <ol>
